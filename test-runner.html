@@ -1,0 +1,20 @@
+<DOCTYPE! html>
+<html>
+  <head>
+    <title>Unit Test Runner</title>
+    <script src="scripts/munchers.js"></script>
+    <script>
+      var test = {};
+      
+      test.logResult = function (message, didTestPass) {
+        var newLog = document.createElement('p');
+        newLog.innerHtml = message;
+        newLog.style.color = didTestPass ? 'green' : 'red';
+        document.body.appendChild(newLog);
+      }
+    </script>
+  </head>
+  <body>
+    <h2>The Leader Board...</h2>
+  </body>
+</html>
