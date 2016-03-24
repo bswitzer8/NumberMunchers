@@ -78,4 +78,4 @@ app.createLeaderBoard = function () {
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
 
-app.leaderBoard = app.createLeaderBoard;
+app.leaderBoard = app.createLeaderBoard();
