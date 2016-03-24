@@ -3,34 +3,42 @@
 	<head>
         <meta charset="UTF-8" />
         <title>Number Munchers!</title>
+
         <script src="scripts/phaser.js"></script>
+        <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     </head>
 
     <body>
 			
+
 		 <script type="text/javascript">
+		 // This is a reference to our firebase. 
+		 var myDatabase = new Firebase("https://sizzling-inferno-4044.firebaseio.com/");
 
-			window.onload = function() {
+		
 
-					var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+		 // phaser stuff will be here
+		window.onload = function() {
+				// I want to play a game. </saw>
+				var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
-					function preload () {
+				function preload () {
 
-					
+				
 
-					}
+				}
 
-					function create () {
+				function create () {
 
-							
-
-					}
-					
-					function update() {
 						
-					}
 
-			};
+				}
+				
+				function update() {
+					
+				}
+
+		};
 
    		</script>
 			
