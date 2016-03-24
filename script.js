@@ -1,14 +1,21 @@
-function createLeaderBoard () {
+// This serves as a namespace for our custom code, thus preventing the pollution
+// of the global scope.
+var app = {};
+
+// Creates an encapsulated leaderboard object.
+app.createLeaderBoard = function () {
   var MAX_NUM_HIGH_SCORES = 10;
   var highScores = [];
         
   return {
-    // Return a copy of the high scores array.
+    // Return a copy of the high scores array. The score objects in the array
+    // are also copies of the original array's scores, thus effectively
+    // encapsulating the member data.
     getScores: function () {
       var copy = [];
             
       highScores.map(function (highScore) {
-        result.push(highScore);
+        result.push(Object.assign(highScore));
       });
             
       return copy;
@@ -20,23 +27,20 @@ function createLeaderBoard () {
      * string _playerName: The current player's name.
      * number _score:      The ending game's final score.
      * string _schoolName: The current player's school's name.
-     * Date   _date:       The date the game ended.
-     *     (An undefined inDate parameter defaults to the current date.)
      *
      * returns boolean: True means the score was added to the board, false
      *                  means it was not.
      */
-    submitScore: function (_playerName, _score, _schoolName, _date) {
-      // If the caller didn't pass in the score, just return false.
-      if (_score == null && _score == undefined) {
+    submitScore: function (_playerName, _score, _schoolName) {
+      // If the caller didn't pass in a valid score, just return false.
+      if (_score == null || _score == undefined || isNan(score)) {
         return false;
       } else {
         var newHighScore = {
           playerName: _playerName,
           score:      _score,
           schoolName: _schoolName,
-          date:       (_date == null || _date == undefined) ? new Date() :
-                           _date;
+          date:       new Date()
         };
 
         // Check to see if the parameter score qualifies.
@@ -57,15 +61,17 @@ function createLeaderBoard () {
         } else {
           // Insert the new high score.
           highScores.splice(indexToInsert, 0, newHighScore);
-                
-          // Remove lowest high score if too many scores exist.
-          if (highScores.length > MAX_NUM_HIGH_SCORES) {
-            highScores.pop();
-          }
-                
-          return true;                
+        }                
+
+        // Remove lowest high score if too many scores exist.
+        if (highScores.length > MAX_NUM_HIGH_SCORES) {
+          highScores.pop();
         }
+                
+        return true;
       }  // end of if (score == null || score == undefined)
     }  // end of submitScore()
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
+
+app.leaderBoard = app.createLeaderBoard;
