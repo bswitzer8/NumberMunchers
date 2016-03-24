@@ -1,5 +1,5 @@
-// This serves as a namespace for our custom code, thus preventing the pollution
-// of the global scope.
+// This object serves as a namespace for our custom code, thus preventing the
+// pollution of the global scope.
 var app = {};
 
 // Creates an encapsulated leaderboard object.
@@ -24,21 +24,21 @@ app.createLeaderBoard = function () {
     /* If the parameter score beats the lowest high score, add the score to
      * the high scores array and pop the lowest score.
      *
-     * string _playerName: The current player's name.
      * number _score:      The ending game's final score.
+     * string _playerName: The current player's name.
      * string _schoolName: The current player's school's name.
      *
      * returns boolean: True means the score was added to the board, false
      *                  means it was not.
      */
-    submitScore: function (_playerName, _score, _schoolName) {
+    submitScore: function (_score, _playerName, _schoolName) {
       // If the caller didn't pass in a valid score, just return false.
       if (_score == null || _score == undefined || isNan(score)) {
         return false;
       } else {
         var newHighScore = {
-          playerName: _playerName,
           score:      _score,
+          playerName: _playerName,
           schoolName: _schoolName,
           date:       new Date()
         };
@@ -70,7 +70,11 @@ app.createLeaderBoard = function () {
                 
         return true;
       }  // end of if (score == null || score == undefined)
-    }  // end of submitScore()
+    },  // end of submitScore()
+    
+    purgeScores: function () {
+        highScores = [];
+    }
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
 
