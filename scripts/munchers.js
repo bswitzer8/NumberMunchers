@@ -1,9 +1,11 @@
+"use strict";
+
 // This object serves as a namespace for our custom code, thus preventing the
 // pollution of the global scope.
-var app = {};
+var munchers = {};
 
 // Creates an encapsulated leaderboard object.
-app.createLeaderBoard = function () {
+munchers.createLeaderBoard = function () {
   var MAX_NUM_HIGH_SCORES = 10;
   var highScores = [];
         
@@ -15,7 +17,7 @@ app.createLeaderBoard = function () {
       var copy = [];
             
       highScores.map(function (highScore) {
-        result.push(Object.assign(highScore));
+        copy.push(Object.assign(highScore));
       });
             
       return copy;
@@ -33,7 +35,7 @@ app.createLeaderBoard = function () {
      */
     submitScore: function (_score, _playerName, _schoolName) {
       // If the caller didn't pass in a valid score, just return false.
-      if (_score == null || _score == undefined || isNan(score)) {
+      if (_score == null || _score == undefined || isNaN(_score)) {
         return false;
       } else {
         var newHighScore = {
@@ -53,8 +55,8 @@ app.createLeaderBoard = function () {
         // If the parameter score doesn't qualify.
         if (indexToInsert === -1) {
           // If the leaderboard isn't full, add the new score anyway.
-          if (highScore.length < MAX_NUM_HIGH_SCORES) {
-            highScores.push(score);
+          if (highScores.length < MAX_NUM_HIGH_SCORES) {
+            highScores.push(_score);
           } else {
             return false;
           }
@@ -78,4 +80,4 @@ app.createLeaderBoard = function () {
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
 
-app.leaderBoard = app.createLeaderBoard();
+munchers.leaderBoard = munchers.createLeaderBoard();
