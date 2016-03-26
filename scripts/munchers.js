@@ -1,8 +1,12 @@
+// username: fsunumbermunchers@gmail.com
+// password: gotta munch em all
+
 "use strict";
 
 // This object serves as a namespace for our custom code, thus preventing the
 // pollution of the global scope.
 var munchers = {};
+var userData;
 
 munchers.createMonster = function(){ return {}; };
 munchers.createPlayer = function(){ return { name: "player" } };
@@ -258,3 +262,58 @@ munchers.createLeaderBoard = function () {
 
 munchers.leaderBoard = munchers.createLeaderBoard();
 munchers.grid = munchers.createGrid();
+
+/************************************************************************************
+ *  Module      : Munchers Authentication Functions (authFunctions)
+ *  Date Created: 3/26/16
+ *  Author      : Nicholas Voran
+ *  Description : 
+ *      The Munchers Authentication Functions provide a method of authenticating
+ *      a given user. During successful authentication, user data is provided by 
+ *      Facebook in the form of of the authData object. This object contains useful 
+ *      user data and authentication tokens to verify authentication at any time.
+ *  Documentation: Firebase Facebook Authentication 
+ *      https://www.firebase.com/docs/web/guide/login/facebook.html
+ *      The documentation above includes a listing of all member variables and 
+ *      functions of the authData object.
+ *  Functions:
+ *      login()
+ *          Description: Creates a pop-up window which will prompt the user to log in 
+ *          using their facebook credentials. Once the user successfully authenticates,
+ *          the userData object is populated with user information and auth tokens.
+ *          Returns: N/A
+ *      logout() 
+ *          Description: Deauthenticates the currrent Firebase session.
+ *          Returns: N/A
+ ***********************************************************************************/
+munchers.authFunctions = function(){
+    return {
+        // Purpose: Provide login functionality & aquire user data
+        // Function Call: munchers.auth.login()
+        login: function(){
+            myDatabase.authWithOAuthPopup("facebook", function(error, authData){
+                if (error) {
+                    console.log("Login Failed!", error);
+                } // end if(error)
+                else {
+                    // Assign user data to userData variable with munchers.js scope
+                    userData = authData;
+                    console.log("Authentication Successful:", userData.facebook.displayName);
+                    document.getElementById("WelcomeMessage").innerHTML = "Welcome " + userData.facebook.displayName + "!";
+                } // end else
+            },{
+                remember: "sessionOnly"
+            }); // end myDatabase.authWithOAuthPopup
+        }, // end login()
+        // log the user out and print to console for verification
+        logout: function(){
+            myDatabase.unauth()
+            {
+                console.log("Logout successful:", userData.facebook.displayName);
+                document.getElementById("WelcomeMessage").innerHTML = "Goodbye " + userData.facebook.displayName + "!";
+            }; 
+        } // end logout()
+    }; // end definition of authFunctions object
+} // end authFunctions()
+// set munchers.auth name accessibility
+munchers.auth = munchers.authFunctions();
