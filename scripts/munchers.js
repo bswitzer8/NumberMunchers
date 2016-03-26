@@ -258,4 +258,3 @@ munchers.createLeaderBoard = function () {
 
 munchers.leaderBoard = munchers.createLeaderBoard();
 munchers.grid = munchers.createGrid();
-
