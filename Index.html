@@ -7,50 +7,46 @@
         <script src="scripts/phaser.js"></script>
         <script src="scripts/munchers.js"></script>
         <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
-    </head>
+        <script type="text/javascript">
+            // This is a reference to our firebase. 
+            var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")    
+            munchers.grid.generateMultiple();
+            munchers.grid.fill();
+            munchers.grid.generateMonster();
+            munchers.grid.generateMonster();
+            munchers.grid.generateMonster();
+            munchers.grid.debug();
+            
+            munchers.grid.reset();
+            munchers.grid.debug();
+            console.log(munchers.grid.grid());
 
-    <body>
-			
+            // phaser stuff will be here
+            window.onload = function() {
+                // I want to play a game. </saw>
+                var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
-		 <script type="text/javascript">
-		 // This is a reference to our firebase. 
-		 var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")
+                function preload () {
 
-		 munchers.grid.generateMultiple();
-		 munchers.grid.fill();
-		 munchers.grid.generateMonster();
-		 munchers.grid.generateMonster();
-		 munchers.grid.generateMonster();
-		 munchers.grid.debug();
-		
-		 munchers.grid.reset();
-		 munchers.grid.debug();
-		 console.log(munchers.grid.grid());
+                
 
-		 // phaser stuff will be here
-		window.onload = function() {
-				// I want to play a game. </saw>
-				var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+                }
+                function create () {
 
-				function preload () {
+                        
 
-				
-
-				}
-
-				function create () {
-
-						
-
-				}
-				
-				function update() {
-					
-				}
-
-		};
+                }
+                function update() {
+                    
+                }
+            };
 
    		</script>
-			
+	</head>
+    
+    <body>
+        <p id=WelcomeMessage>You are not currently logged in.</p>
+        <p><button onclick="munchers.auth.login()">Log In</button></p>
+        <p><button onclick="munchers.auth.logout()">Log Out</button></p>    		
 	</body>
 </html>
