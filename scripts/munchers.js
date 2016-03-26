@@ -7,6 +7,8 @@ var munchers = {};
 munchers.createMonster = function(){ return {}; };
 munchers.createPlayer = function(){ return { name: "player" } };
 
+
+
 /*
  *  Module      : Muncher's Grid
  *  Date Created: 3/24/2016
@@ -180,7 +182,43 @@ munchers.createGrid = function () {
 } // end of createGrid
 
 
-// Creates an encapsulated leaderboard object.
+
+/*
+ *  Module      : Munchers' Leader Board
+ *  Date Created: 3/22/2016
+ *  Author      : Brent Miller
+ *
+ *  Description : 
+ *  The leader board will house the game's high scores during runtime. It
+ *  validates any score submitted to it and retains all valid scores that are
+ *  the ten highest scores submitted to it during runtime. For now, the leader
+ *  board module does not persist its scores - some other mechanism in the
+ *  application will have to handle that responsibility. Technically speaking,
+ *  the module is implemented as an encapsulated JavaScript object that stores
+ *  the high scores as private member data.
+ *  
+ *  -- getScores() - returns a copy of the application's current high scores as
+ *  an array of objects. A high score object follows the following template:
+ *  {
+ *    score: number
+ *    playerName: string
+ *    schoolName: string
+ *    date: Date
+ *  }
+ *
+ *  -- generateMultiple() - sets the _number variable to a random number
+ *  between 2 and 11. This will be used to determine the multiples the 
+ *  player must search for on the grid.
+ *
+ *  -- grid() - returns the _grid object.
+ *
+ *  -- submitScore() - accepts a score for submission to the leader board. It
+ *  stores the score if (1) the parameters are valid AND (2a) the score is
+ *  higher than the lowest current high score OR (2b) the leader board has not
+ *  yet reached its defined maximum number of high scores.
+ *
+ *  -- clear() - purges the leader board of scores.
+ */
 munchers.createLeaderBoard = function () {
   var MAX_NUM_HIGH_SCORES = 10;
   var highScores = [];
@@ -190,16 +228,20 @@ munchers.createLeaderBoard = function () {
     // are also copies of the original array's scores, thus effectively
     // encapsulating the member data.
     getScores: function () {
-      var copy = [];
+      var copyOfArray = [];
             
       highScores.map(function (highScore) {
-        copy.push(Object.assign(highScore));
+        var copyOfObject = {};
+
+        Object.assign(copyOfObject, highScore)
+        copyOfArray.push(copyOfObject);
       });
             
-      return copy;
+      return copyOfArray;
     },
         
-    /* If the parameter score beats the lowest high score, add the score to
+    /* IF (1) the parameter score beats the lowest high score OR (2) the leader
+     * board has not reached the maximum number of scores, THEN add the score to
      * the high scores array and pop the lowest score.
      *
      * number _score:      The ending game's final score.
@@ -221,24 +263,24 @@ munchers.createLeaderBoard = function () {
           date:       new Date()
         };
 
-        // Check to see if the parameter score qualifies.
-        var indexToInsert = highScores.findIndex(function (highScore) {
-          if (_score > highScore) {
+        // Check if parameter score is higher than lowest score in array.
+        var arrayIndexToInsert = highScores.findIndex(function (highScore) {
+          if (_score > highScore.score) {
             return true;
           }
         });
 
         // If the parameter score doesn't qualify.
-        if (indexToInsert === -1) {
+        if (arrayIndexToInsert === -1) {
           // If the leaderboard isn't full, add the new score anyway.
           if (highScores.length < MAX_NUM_HIGH_SCORES) {
-            highScores.push(_score);
+            highScores.push(newHighScore);
           } else {
             return false;
           }
         } else {
           // Insert the new high score.
-          highScores.splice(indexToInsert, 0, newHighScore);
+          highScores.splice(arrayIndexToInsert, 0, newHighScore);
         }                
 
         // Remove lowest high score if too many scores exist.
@@ -250,11 +292,13 @@ munchers.createLeaderBoard = function () {
       }  // end of if (score == null || score == undefined)
     },  // end of submitScore()
     
-    purgeScores: function () {
+    clear: function () {
         highScores = [];
     }
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
+
+
 
 munchers.leaderBoard = munchers.createLeaderBoard();
 munchers.grid = munchers.createGrid();
