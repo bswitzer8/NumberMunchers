@@ -5,7 +5,42 @@
 var munchers = {};
 
 munchers.createMonster = function(){ return {}; };
+munchers.createPlayer = function(){ return { name: "player" } };
 
+/*
+ *  Module      : Muncher's Grid
+ *  Date Created: 3/24/2016
+ *  Author      : (Stephen) Ben Switzer
+ *  Description : 
+ *  This grid will house all of the numbers
+ *  in a 2 dimensional array (_grid object). These multiples will be random 
+ *  and it will be up to the player to select the numbers that
+ *  are multiple of the value stored in _number. 
+ *  The grid's dimensions are set using the GRID_HEIGHT and GRID_WIDTH
+ *  variables. 
+ *  
+ *  -- generateMonster() - places a monster on the perimeter of the grid.
+ *  this will be placed at random (if the (player/a troggle) isn't already
+ *  occupying the square).
+ *
+ *  -- generateMultiple() - sets the _number variable to a random number
+ *  between 2 and 11. This will be used to determine the multiples the 
+ *  player must search for on the grid.
+ *
+ *  -- grid() - returns the _grid object.
+ *
+ *  -- fill() - fills up the board with random numbers and random multiples
+ *  of the _number variable. It uses 2 for loops to iterate over every
+ *  position on the grid from (0, 0) to (GRID_WIDTH - 1, GRID_HEIGHT - 1).
+ *
+ *  -- number() - returns the value of _number. 
+ *
+ *  -- reset() -- clears the grid, sets every position int he grid to ''.
+ *
+ *  -- debug() -- displays the current grid's dimensions and the value of
+ *  _number. Prints out the entire grid in console, showing the positions 
+ *  of the troggles and player. 
+ */
 munchers.createGrid = function () {
   // Height and Width of the grid.
   var GRID_HEIGHT = 6;
@@ -67,7 +102,7 @@ munchers.createGrid = function () {
       return _grid; 
     },
 
-    // fills the board with numbers, and producdes multiples of said numbers. 
+    // fills the board with numbers, and produces multiples of said numbers. 
     fill: function () {
         for(var w = 0; w < GRID_WIDTH; ++w)
         {
@@ -90,6 +125,8 @@ munchers.createGrid = function () {
 
           } // end of height for loop.
         } // end of width for loop.
+
+        _grid[2][2] = munchers.createPlayer();
     },
 
     // return the number we are looking for multiples of.
@@ -100,8 +137,12 @@ munchers.createGrid = function () {
     // Clears the grid.
     reset: function () {
       for(var w = 0; w < GRID_WIDTH; ++w)
+      {
         for(var h = 0; h < GRID_HEIGHT; ++h)
+        {
           _grid[w][h] = '';
+        }
+      }
     },
 
     /*
@@ -120,9 +161,16 @@ munchers.createGrid = function () {
         for(var w = 0; w < GRID_WIDTH; ++w)
         {
           if(typeof _grid[w][h] !== "object")
+          {
             g += _grid[w][h] + (_grid[w][h] < 10 ? "    " : "   ");
+          }
           else 
-            g += "T    ";
+          {
+            if(_grid[w][h].name == undefined)
+              g += "T    ";
+            else
+              g += "M    ";
+          }
         }
         console.log(g + "\n");
       }
