@@ -5,6 +5,7 @@
         <title>Number Munchers!</title>
 
         <script src="scripts/phaser.js"></script>
+        <script src="scripts/munchers.js"></script>
         <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     </head>
 
@@ -13,9 +14,17 @@
 
 		 <script type="text/javascript">
 		 // This is a reference to our firebase. 
-		 var myDatabase = new Firebase("https://sizzling-inferno-4044.firebaseio.com/");
+		 var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")
 
-		
+		 munchers.grid.generateMultiple();
+		 munchers.grid.fill();
+		 munchers.grid.generateMonster();
+		 munchers.grid.generateMonster();
+		 munchers.grid.generateMonster();
+		 munchers.grid.debug();
+		 console.log(munchers.grid.grid());
+		 munchers.grid.reset();
+		 munchers.grid.debug();
 
 		 // phaser stuff will be here
 		window.onload = function() {
