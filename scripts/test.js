@@ -20,7 +20,7 @@ munchersTest.logResult = function (testDescription, didTestPass) {
   testDescription += ' -- ';
   testDescription += didTestPass ? 'PASSED' : 'FAILED';
   
-  newLog.innerHTML = testDescription;
+  newLog.innerHTML   = testDescription;
   newLog.style.color = didTestPass ? 'green' : 'red';
   
   document.body.appendChild(newLog);
@@ -33,48 +33,178 @@ munchersTest.logResult = function (testDescription, didTestPass) {
 munchersTest.leaderBoardTests = {};
 
 munchersTest.leaderBoardTests.shouldRejectNullScore = function () {
-  var didReject1;
-  var didReject2;
+  var wasCallRejected;
+  var isBoardEmpty;
 
-  munchers.leaderBoard.purgeScores();
-  didReject1 = !munchers.leaderBoard.submitScore(null, 'player', 'school');
-  didReject2 = Boolean(munchers.leaderBoard.getScores().length === 0);
+  munchers.leaderBoard.clear();
   
-  return Boolean(didReject1 && didReject2);
+  wasCallRejected = !munchers.leaderBoard.submitScore(null, 'player', 'school');
+  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  
+  return wasCallRejected && isBoardEmpty;
 };
 
 munchersTest.leaderBoardTests.shouldRejectUndefinedScore = function () {
-  var didReject1;
-  var didReject2;
+  var wasCallRejected;
+  var isBoardEmpty;
 
-  munchers.leaderBoard.purgeScores();
-  didReject1 = !munchers.leaderBoard.submitScore(undefined, 'player', 'school');
-  didReject2 = Boolean(munchers.leaderBoard.getScores().length === 0);
+  munchers.leaderBoard.clear();
   
-  return Boolean(didReject1 && didReject2);
+  wasCallRejected = !munchers.leaderBoard.submitScore(undefined, 'player', 'school');
+  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  
+  return wasCallRejected && isBoardEmpty;
 };
 
 munchersTest.leaderBoardTests.shouldRejectStringScore = function () {
-  var didReject1;
-  var didReject2;
+  var wasCallRejected;
+  var isBoardEmpty;
 
-  munchers.leaderBoard.purgeScores();
-  didReject1 = !munchers.leaderBoard.submitScore('not a number', 'player', 'school');
-  didReject2 = Boolean(munchers.leaderBoard.getScores().length === 0);
+  munchers.leaderBoard.clear();
   
-  return Boolean(didReject1 && didReject2);
+  wasCallRejected = !munchers.leaderBoard.submitScore('not a number', 'player', 'school');
+  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  
+  return wasCallRejected && isBoardEmpty;
+};
+
+munchersTest.leaderBoardTests.shouldRejectEmptyScore = function () {
+  var wasCallRejected;
+  var isBoardEmpty;
+
+  munchers.leaderBoard.clear();
+  
+  wasCallRejected = !munchers.leaderBoard.submitScore();
+  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  
+  return wasCallRejected && isBoardEmpty;
 };
 
 munchersTest.leaderBoardTests.shouldAcceptValidScore = function () {
-  var didAccept1;
-  var didAccept2;
+  var wasCallAccepted;
+  var doesBoardHaveAScore;
 
-  munchers.leaderBoard.purgeScores();
-  didAccept1 = munchers.leaderBoard.submitScore(100, 'player', 'school');
-  didAccept2 = Boolean(munchers.leaderBoard.getScores().length > 0);
+  munchers.leaderBoard.clear();
   
-  return Boolean(didAccept1 && didAccept2);
+  wasCallAccepted     = munchers.leaderBoard.submitScore(100, 'player', 'school');
+  doesBoardHaveAScore = munchers.leaderBoard.getScores().length > 0;
+  
+  return wasCallAccepted && doesBoardHaveAScore;
 };
+
+munchersTest.leaderBoardTests.shouldAcceptScoreWithoutNames = function () {
+  var wasCallAccepted;
+  var doesBoardHaveAScore;
+
+  munchers.leaderBoard.clear();
+  
+  wasCallAccepted     = munchers.leaderBoard.submitScore(100);
+  doesBoardHaveAScore = munchers.leaderBoard.getScores().length > 0;
+  
+  return wasCallAccepted && doesBoardHaveAScore;
+};
+
+munchersTest.leaderBoardTests.shouldCreateHighScoreObjectWithCorrectProperties = function () {
+  var highScoreObject;
+  var objectPropertyNames;
+
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(100, 'player', 'school');
+
+  highScoreObject  = munchers.leaderBoard.getScores()[0];
+  objectPropertyNames = Object.getOwnPropertyNames(highScoreObject);
+  
+  return objectPropertyNames.length   === 4 &&
+    typeof highScoreObject.score      === 'number' &&
+    typeof highScoreObject.playerName === 'string' &&
+    typeof highScoreObject.schoolName === 'string';
+};
+
+munchersTest.leaderBoardTests.shouldUseTodaysDate = function () {
+  var highScoreObject;
+  var todaysDate = new Date();
+
+  var isTodaysYear;
+  var isTodaysMonth;
+  var isTodaysDate;
+
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(100, 'player', 'school');
+
+  highScoreObject = munchers.leaderBoard.getScores()[0];
+
+  isTodaysYear  = highScoreObject.date.getFullYear() === todaysDate.getFullYear();
+  isTodaysMonth = highScoreObject.date.getMonth()    === todaysDate.getMonth();
+  isTodaysDate  = highScoreObject.date.getDate()     === todaysDate.getDate();
+
+  return isTodaysYear && isTodaysMonth && isTodaysDate;
+};
+
+munchersTest.leaderBoardTests.shouldSortHighScoresByScore = function () {
+  var isFirstScoreFirst;
+  var isSecondScoreSecond;
+  var isThirdScoreThird;
+  
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  
+  isFirstScoreFirst   = munchers.leaderBoard.getScores()[0].playerName === 'first';
+  isSecondScoreSecond = munchers.leaderBoard.getScores()[1].playerName === 'second';
+  isThirdScoreThird   = munchers.leaderBoard.getScores()[2].playerName === 'third';
+
+  return isFirstScoreFirst && isSecondScoreSecond && isThirdScoreThird;
+}
+
+munchersTest.leaderBoardTests.shouldEnforceMaxNumOfScores = function () {
+  var numScoresSubmitted = 0;
+  var numScoresStored;
+  
+  munchers.leaderBoard.clear();
+  
+  for (var i = 0; i < 11; ++i) {
+    munchers.leaderBoard.submitScore(i);
+    ++numScoresSubmitted;
+  }
+  
+  numScoresStored = munchers.leaderBoard.getScores().length;
+  
+  return numScoresSubmitted === 11 && numScoresStored === 10;
+}
+
+munchersTest.leaderBoardTests.shouldEncapsulateHighScoresArray = function () {
+  var isHighScoresArrayPublic;
+  var copyOfArray;
+  var doChangesPropogate;
+  
+  isHighScoresArrayPrivate =
+    munchers.leaderBoard.hasOwnProperty('highScores') === false;
+  
+  munchers.leaderBoard.clear();
+  copyOfArray = munchers.leaderBoard.getScores();  
+  munchers.leaderBoard.submitScore(333, 'first', 'score');
+  doChangesPropogate = copyOfArray.length === munchers.leaderBoard.getScores().length;
+
+  return isHighScoresArrayPrivate && !doChangesPropogate;
+}
+
+
+munchersTest.leaderBoardTests.shouldEncapsulateHighScoresObjects = function () {
+  var copyOfAHighScore;
+  var doChangesPropogate;
+    
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(333, 'first', 'score');
+  
+  copyOfAHighScore = munchers.leaderBoard.getScores()[0];
+  copyOfAHighScore.playerName = 'changed name';
+  
+  doChangesPropogate =
+    copyOfAHighScore.playerName === munchers.leaderBoard.getScores()[0].playerName;
+
+  return !doChangesPropogate;
+}
 
 
 
@@ -189,9 +319,51 @@ window.onload = function () {
   );
   
   munchersTest.logResult(
+    'Should reject the submission of an empty score',
+    munchersTest.leaderBoardTests.shouldRejectEmptyScore()
+  );
+  
+  munchersTest.logResult(
     'Should accept the submission of a valid score',
     munchersTest.leaderBoardTests.shouldAcceptValidScore()
   );
+  
+  munchersTest.logResult(
+    'Should accept the submission of a score without names',
+    munchersTest.leaderBoardTests.shouldAcceptScoreWithoutNames()
+  );
+
+  munchersTest.logResult(
+    'Should create a high score object with the correct properties',
+    munchersTest.leaderBoardTests.shouldCreateHighScoreObjectWithCorrectProperties()
+  );
+  
+  munchersTest.logResult(
+    "Should use today's date for the high score's date property",
+    munchersTest.leaderBoardTests.shouldUseTodaysDate()
+  );
+
+  munchersTest.logResult(
+    'Should sort high scores by score',
+    munchersTest.leaderBoardTests.shouldSortHighScoresByScore()
+  );
+  
+  munchersTest.logResult(
+    'Should enforce a max number of high scores',
+    munchersTest.leaderBoardTests.shouldEnforceMaxNumOfScores()
+  );
+  
+  munchersTest.logResult(
+    'Should encapsulate the high scores array',
+    munchersTest.leaderBoardTests.shouldEncapsulateHighScoresArray()
+  );
+
+  munchersTest.logResult(
+    'Should encapsulate the high scores objects',
+    munchersTest.leaderBoardTests.shouldEncapsulateHighScoresObjects()
+  );
+
+
   
   // GRID TESTS
   munchersTest.describeBlock('The Grid =>');
