@@ -1,12 +1,16 @@
-<DOCTYPE! html>
+<!DOCTYPE html>
 <html>
 	<head>
         <meta charset="UTF-8" />
         <title>Number Munchers!</title>
 
+        <link rel="stylesheet" type="text/css" href="style.css"></link>
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>
+
         <script src="scripts/phaser.js"></script>
+        <script src="scripts/firebase.js"></script>
         <script src="scripts/munchers.js"></script>
-        <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+
         <script type="text/javascript">
             // This is a reference to our firebase. 
             var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")    
@@ -24,29 +28,33 @@
             // phaser stuff will be here
             window.onload = function() {
                 // I want to play a game. </saw>
-                var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+                var game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
 
-                function preload () {
-
-                
+                function preload () {                
 
                 }
                 function create () {
-
-                        
 
                 }
                 function update() {
                     
                 }
             };
-
    		</script>
 	</head>
     
     <body>
-        <p id=WelcomeMessage>You are not currently logged in.</p>
-        <p><button onclick="munchers.auth.login()">Log In</button></p>
-        <p><button onclick="munchers.auth.logout()">Log Out</button></p>    		
-	</body>
+        <nav>
+            <h1>Return of the Number Munchers</h1>
+            
+            <ul>
+                <li><a id="login-link"  onclick="munchers.auth.login()" >Log In</a></li>
+                <li><a id="logout-link" onclick="munchers.auth.logout()">Log Out</a></li>
+                <li><a>New Game</a></li>
+                <li><a>View Leader Board</a></li>
+            </ul>
+        </nav>
+        
+        <main id="phaser-canvas"></main>
+    </body>
 </html>
