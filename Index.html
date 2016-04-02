@@ -1,11 +1,11 @@
-<DOCTYPE! html>
+<!DOCTYPE html>
 <html>
 	<head>
         <meta charset="UTF-8" />
         <title>Number Munchers!</title>
 
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P">
+        <link rel="stylesheet" type="text/css" href="style.css"></link>
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>
 
         <script src="scripts/phaser.js"></script>
         <script src="scripts/firebase.js"></script>
@@ -28,7 +28,7 @@
             // phaser stuff will be here
             window.onload = function() {
                 // I want to play a game. </saw>
-                var game = new Phaser.Game(500, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
+                var game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
 
                 function preload () {                
 
@@ -44,21 +44,17 @@
 	</head>
     
     <body>
-        <header>
-            <button id="login-button"  onclick="munchers.auth.login()" >Log In</button>
-            <button id="logout-button" onclick="munchers.auth.logout()">Log Out</button>
+        <nav>
+            <h1>Return of the Number Munchers</h1>
             
             <ul>
+                <li><a id="login-link"  onclick="munchers.auth.login()" >Log In</a></li>
+                <li><a id="logout-link" onclick="munchers.auth.logout()">Log Out</a></li>
                 <li><a>New Game</a></li>
                 <li><a>View Leader Board</a></li>
             </ul>
-        </header>
+        </nav>
         
         <main id="phaser-canvas"></main>
-        
-        <footer>
-            <h1>Return of the Number Munchers</h1>
-            <img src="assets/muncher.svg" height="40px" width="40px">
-        </footer>
-	</body>
+    </body>
 </html>

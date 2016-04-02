@@ -1,0 +1,53 @@
+html, body, nav, main {
+    height: 100%;
+    margin: 0;
+}
+
+html, body {
+    width: 100%;
+}
+
+body {
+    background-color: #000000;
+    color: #888888;
+    font-family: 'Press Start 2P', cursive;    
+    display: flex;
+}
+
+a {
+    color: rgb(46, 219, 46);
+}
+
+nav {
+    background-color: #222222;
+    height: 100%;
+    width: 25%
+}
+
+nav h1 {
+    margin-left: 20px;
+}
+
+nav h1 {
+    font-size: 0.9em;
+}
+
+nav ul {
+    list-style-type: none;
+}
+
+nav ul li {
+    font-size: 0.8em;
+    margin-bottom: 10px;
+}
+
+#logout-link {
+    display: none;  // override in the login() function
+}
+
+main {
+    width: 75%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
