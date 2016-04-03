@@ -262,15 +262,58 @@ munchers.createLeaderBoard = function () {
       if (_score == null || _score == undefined || isNaN(_score)) {
         return false;
       } else {
+          
+        // If _playerName or _schoolName is blank, insert "Anonymous"
+            // Firebase push requires a defined value for all parameters
+        if (_playerName == null || _playerName == undefined){
+            _playerName = "Anonymous";
+        } 
+        if (_schoolName == null || _schoolName == undefined){
+            _schoolName = "Anonymous";
+        }
+        
+        // Create date object to pull strings from
+        var _date = new Date();
+        // Create new JSON date variable compatible with Firebase
+        var myDate = {
+            Year: _date.getFullYear(),
+            Month: _date.getMonth(),
+            Day: _date.getDate()
+        }  
+        // Create newHighScore object encapsilating new date object and player score information
         var newHighScore = {
           score:      _score,
           playerName: _playerName,
           schoolName: _schoolName,
-          date:       new Date()
+          date:       myDate
         };
         
-        //var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
+        // Create new reference to school specific leaderboard
         var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
+        
+        /*
+        // Check if All_Time_Leaderboard is full
+        if (munchers.fire.getAllTimeEntryCount() < 10){
+            allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
+        } else {
+            // Else if high score qualifies for All_TimeLeaderboard
+            if (munchers.fire.getLowScore_AllTime()._score < newHighScore.score){
+                allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
+                //trimTheEnds_AllTime();
+            }
+        }
+        // Check if School_Specific_Leaderboard is full
+        if (munchers.fire.getSchoolEntryCount(newHighScore.schoolName) <10){
+            schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
+        }else {
+            // Else if high score qualifies for School_Specific_Leaderboard
+            if (munchers.fire.getLowScore_School(newHighScore.schoolName) < newHighScore.score){
+                schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
+                //trimTheEnds_School(newHighScore.schoolName);
+            }
+        }
+        */
+        
         // Check if parameter score is higher than lowest score in array.
         var arrayIndexToInsert = highScores.findIndex(function (highScore) {
           if (_score > highScore.score) {
@@ -302,13 +345,14 @@ munchers.createLeaderBoard = function () {
         //Add score to School Specific Leaderboard
         //var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
         schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
-                
+      
         return true;
       }  // end of if (score == null || score == undefined)
     },  // end of submitScore()
     
     clear: function () {
         highScores = [];
+        myDatabase.remove();
     }
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
@@ -376,8 +420,8 @@ munchers.grid = munchers.createGrid();
                 remember: "sessionOnly"
             }); // end myDatabase.authWithOAuthPopup
             
-            document.getElementById("logout-link").style.display= "initial";
-            document.getElementById("login-link").style.display= "none";
+           //document.getElementById("logout-link").style.display= "initial";
+           //document.getElementById("login-link").style.display= "none";
         }, // end login()
         
         // Purpose: log the user out and print to console for verification.
@@ -387,12 +431,12 @@ munchers.grid = munchers.createGrid();
             {
                 console.log("Logout successful:", userData.facebook.displayName);
             }; 
-            document.getElementById("logout-link").style.display= "none";
-            document.getElementById("login-link").style.display= "initial";
+            //document.getElementById("logout-link").style.display= "none";
+            //document.getElementById("login-link").style.display= "initial";
         }, // end logout()
         
         // Purpose: Get lowest score (object) from All_Time_Leaderboard
-        // Function Call: munchers.fire.getAllTimeLowScore();
+        // Function Call: munchers.fire.getLowScore_AllTime();
         getLowScore_AllTime: function(){
             allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
             tempScore = snapshot.val();
@@ -401,7 +445,7 @@ munchers.grid = munchers.createGrid();
         }, // end 
         
         // Purpose: Get lowest score (object) from School_Specific_Leaderboard
-        // Function Call: munchers.fire.getSchoolLowScore(_schoolName); 
+        // Function Call: munchers.fire.getLowScore_School(_schoolName); 
         getLowScore_School: function(_schoolName){
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
             schoolScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
@@ -411,7 +455,7 @@ munchers.grid = munchers.createGrid();
         }, // end
         
         // Purpose: Get count of entries to All_Time_Leaderboard.
-        // Function Call: munchers.fire.getAllTimeEntryCount(); 
+        // Function Call: munchers.fire.getEntryCount_AllTime(); 
         getEntryCount_AllTime: function(){
            allTimeScoresRef.once("value", function(snapshot) {
                 tempCount = snapshot.numChildren();
@@ -420,7 +464,7 @@ munchers.grid = munchers.createGrid();
         }, // end 
         
         // Purpose: Get count of entries to School_Specific_Leaderboard.
-        // Function Call: munchers.fire.getSchoolEntryCount(_schoolName);
+        // Function Call: munchers.fire.getEntryCount_School(_schoolName);
         getEntryCount_School: function (_schoolName){
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
             schoolScoresRef.once("value", function(snapshot) {
@@ -430,25 +474,24 @@ munchers.grid = munchers.createGrid();
         },
         
         // Purpose: 
-        // Function Call: 
+        // Function Call: trimTheEnds_AllTime();
         trimTheEnds_AllTime: function (){
            var tempKey;
-           var AllDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/All_Time_Leaderboard/");
             allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
-            tempKey = snapshot.key();
-            return;
+                tempKey = snapshot.key();
             });
-            AllDatabase.child(tempKey).remove();
-
+            allTimeScoresRef.child(tempKey).remove();
         },
         
         // Purpose: 
-        // Function Call: 
+        // Function Call: trimTheEnds_School(_schoolName);
        trimTheEnds_School: function (_schoolName){
+            var tempKey;
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
-            schoolScoresRef.once("value", function(snapshot) {
-                
+            schoolScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
+                tempKey = snapshot.key();   
             });
+            schoolScoresRef.child(tempKey).remove();
         }
         
         // Purpose: 
