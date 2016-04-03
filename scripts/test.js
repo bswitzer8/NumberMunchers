@@ -470,15 +470,8 @@ window.onload = function () {
     munchersTest.gridTests.shouldDebugTheGrid()
   );
   
-  // GRID TESTS
+  // DATABASE TESTS
   munchersTest.describeBlock('The Database =>');
-  
-  /*
-  munchersTest.logResult(
-    '',
-
-  );
-  */
   
   munchersTest.logResult(
     'All Time Low Score Returned Successfully',

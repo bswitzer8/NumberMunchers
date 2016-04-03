@@ -227,23 +227,13 @@ munchers.createGrid = function () {
  */
 munchers.createLeaderBoard = function () {
   var MAX_NUM_HIGH_SCORES = 10;
-  var highScores = [];
         
   return {
     // Return a copy of the high scores array. The score objects in the array
     // are also copies of the original array's scores, thus effectively
     // encapsulating the member data.
     getScores: function () {
-      var copyOfArray = [];
-            
-      highScores.map(function (highScore) {
-        var copyOfObject = {};
-
-        Object.assign(copyOfObject, highScore)
-        copyOfArray.push(copyOfObject);
-      });
-            
-      return copyOfArray;
+       return munchers.fire.getScores_AllTime();
     },
         
     /* IF (1) the parameter score beats the lowest high score OR (2) the leader
@@ -274,7 +264,7 @@ munchers.createLeaderBoard = function () {
         
         // Create date object to pull strings from
         var _date = new Date();
-        // Create new JSON date variable compatible with Firebase
+        // Create new JSON date boject compatible with Firebase
         var myDate = {
             Year: _date.getFullYear(),
             Month: _date.getMonth(),
@@ -291,73 +281,35 @@ munchers.createLeaderBoard = function () {
         // Create new reference to school specific leaderboard
         var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
         
-        /*
         // Check if All_Time_Leaderboard is full
-        if (munchers.fire.getAllTimeEntryCount() < 10){
+        if (munchers.fire.getEntryCount_AllTime() < MAX_NUM_HIGH_SCORES){
             allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
         } else {
             // Else if high score qualifies for All_TimeLeaderboard
             if (munchers.fire.getLowScore_AllTime()._score < newHighScore.score){
                 allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
-                //trimTheEnds_AllTime();
+                trimTheEnds_AllTime();
             }
         }
         // Check if School_Specific_Leaderboard is full
-        if (munchers.fire.getSchoolEntryCount(newHighScore.schoolName) <10){
+        if (munchers.fire.getEntryCount_School(newHighScore.schoolName) < MAX_NUM_HIGH_SCORES){
             schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
-        }else {
+        } else {
             // Else if high score qualifies for School_Specific_Leaderboard
             if (munchers.fire.getLowScore_School(newHighScore.schoolName) < newHighScore.score){
                 schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
-                //trimTheEnds_School(newHighScore.schoolName);
+                trimTheEnds_School(newHighScore.schoolName);
             }
         }
-        */
-        
-        // Check if parameter score is higher than lowest score in array.
-        var arrayIndexToInsert = highScores.findIndex(function (highScore) {
-          if (_score > highScore.score) {
-            return true;
-          }
-        });
-
-        // If the parameter score doesn't qualify.
-        if (arrayIndexToInsert === -1) {
-          // If the leaderboard isn't full, add the new score anyway.
-          if (highScores.length < MAX_NUM_HIGH_SCORES) {
-            highScores.push(newHighScore);
-          } else {
-            return false;
-          }
-        } else {
-          // Insert the new high score.
-          highScores.splice(arrayIndexToInsert, 0, newHighScore);
-        }                
-
-        // Remove lowest high score if too many scores exist.
-        if (highScores.length > MAX_NUM_HIGH_SCORES) {
-          highScores.pop();
-        }
-        
-        // Add score to the All Time Leaderboard
-        // var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
-        allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
-        //Add score to School Specific Leaderboard
-        //var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
-        schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
-      
         return true;
       }  // end of if (score == null || score == undefined)
     },  // end of submitScore()
-    
+    // Clear all leaderboards - primarily for testing purposes.
     clear: function () {
-        highScores = [];
         myDatabase.remove();
     }
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
-
-
 
 munchers.leaderBoard = munchers.createLeaderBoard();
 munchers.grid = munchers.createGrid();
@@ -473,8 +425,8 @@ munchers.grid = munchers.createGrid();
            return tempCount; 
         },
         
-        // Purpose: 
-        // Function Call: trimTheEnds_AllTime();
+        // Purpose: Remove the lowest score from the All_Time_Leaderboard
+        // Function Call: munchers.fire.trimTheEnds_AllTime();
         trimTheEnds_AllTime: function (){
            var tempKey;
             allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
@@ -483,8 +435,8 @@ munchers.grid = munchers.createGrid();
             allTimeScoresRef.child(tempKey).remove();
         },
         
-        // Purpose: 
-        // Function Call: trimTheEnds_School(_schoolName);
+        // Purpose: Remove the lowest score from the School_Specific_Leaderboard
+        // Function Call: munchers.fire.trimTheEnds_School(_schoolName);
        trimTheEnds_School: function (_schoolName){
             var tempKey;
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
@@ -492,11 +444,30 @@ munchers.grid = munchers.createGrid();
                 tempKey = snapshot.key();   
             });
             schoolScoresRef.child(tempKey).remove();
+        },
+        // Purpose: Return local copy of All_Time_Leaderboard
+        // Function Call: munchers.fire.getScores_AllTime();
+        getScores_AllTime: function () {
+            var localCopy = [];
+            allTimeScoresRef.once("value", function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                    localCopy.unshift(childSnapshot.val());
+                });     
+            });
+        return localCopy;
+        },
+        // Purpose: Return local copy of School_Specific_Leaderboard
+        // Function Call: munchers.fire.getScores_School(_school);
+        getScores_School: function (_school) {
+            var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _school);
+            var localCopy = [];
+            schoolScoresRef.once("value", function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                    localCopy.unshift(childSnapshot.val());
+                });     
+            });
+        return localCopy;
         }
-        
-        // Purpose: 
-        // Function Call: 
-        
     }; // end definition of fireFunctions object
 } // end fireFunctions
 // set munchers.fire name accessibility
