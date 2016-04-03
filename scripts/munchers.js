@@ -1,8 +1,8 @@
 // username: fsunumbermunchers@gmail.com
 // password: gotta munch em all
 
-//var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")
-//var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
+var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")
+var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
 //var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
 
 "use strict";
@@ -371,11 +371,13 @@ munchers.grid = munchers.createGrid();
                     // Assign user data to userData variable with munchers.js scope
                     userData = authData;
                     console.log("Authentication Successful:", userData.facebook.displayName);
-                    document.getElementById("WelcomeMessage").innerHTML = "Welcome " + userData.facebook.displayName + "!";
                 } // end else
             },{
                 remember: "sessionOnly"
             }); // end myDatabase.authWithOAuthPopup
+            
+            document.getElementById("logout-link").style.display= "initial";
+            document.getElementById("login-link").style.display= "none";
         }, // end login()
         
         // Purpose: log the user out and print to console for verification.
@@ -384,8 +386,9 @@ munchers.grid = munchers.createGrid();
             myDatabase.unauth()
             {
                 console.log("Logout successful:", userData.facebook.displayName);
-                document.getElementById("WelcomeMessage").innerHTML = "Goodbye " + userData.facebook.displayName + "!";
             }; 
+            document.getElementById("logout-link").style.display= "none";
+            document.getElementById("login-link").style.display= "initial";
         }, // end logout()
         
         // Purpose: Get lowest score (object) from All_Time_Leaderboard

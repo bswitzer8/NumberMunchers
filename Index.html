@@ -42,56 +42,19 @@
                     
                 }
             };
-<<<<<<< HEAD
             
-            function testSubmit()
-            {
-                munchers.leaderBoard.submitScore(Math.floor((Math.random() * 100) + 1),"John Doe","Rutherford");
-            };
-            function testAllTimeLowScore()
-            {
-              munchers.fire.getLowScore_AllTime();
-            };
-            function testSchoolLowScore()
-            {
-              munchers.fire.getLowScore_School("Rutherford");  
-            };
-            function testAlltimeEntryCount()
-            {
-              munchers.fire.getEntryCount_AllTime();  
-            };
-            function testSchoolEntryCount()
-            {
-              munchers.fire.getEntryCount_School("Rutherford");  
-            };
-            function testTrimTheEnds_AllTime()
-            {
-              munchers.fire.trimTheEnds_AllTime(); 
-            };
-=======
->>>>>>> refs/remotes/origin/master
    		</script>
 	</head>
     
     <body>
-<<<<<<< HEAD
-        <p id=WelcomeMessage>You are not currently logged in.</p>
-        <p><button onclick="munchers.fire.login()">Log In</button></p>
-        <p><button onclick="munchers.fire.logout()">Log Out</button></p>    
-        <p><button onclick="testSubmit()">Submit Test Score</button></p>
-        <p><button onclick="testAllTimeLowScore()">Test All Time Low Score Return</button></p>
-        <p><button onclick="testSchoolLowScore()">Test School Low Score Return</button></p>
-        <p><button onclick="testAlltimeEntryCount()">Test All Time Entry Count</button></p>	
-        <p><button onclick="testSchoolEntryCount()">Test School Entry Count</button></p>	
-        <p><button onclick="testTrimTheEnds_AllTime()">Test Trim The Ends All_Time</button></p>		
+        <!-- This is where the body goes...  -->
 	</body>
-=======
         <nav>
             <h1>Return of the Number Munchers</h1>
             
             <ul>
-                <li><a id="login-link"  onclick="munchers.auth.login()" >Log In</a></li>
-                <li><a id="logout-link" onclick="munchers.auth.logout()">Log Out</a></li>
+                <li><a id="login-link"  onclick="munchers.fire.login()" >Log In</a></li>
+                <li><a id="logout-link" onclick="munchers.fire.logout()">Log Out</a></li>
                 <li><a>New Game</a></li>
                 <li><a>View Leader Board</a></li>
             </ul>
@@ -99,5 +62,4 @@
         
         <main id="phaser-canvas"></main>
     </body>
->>>>>>> refs/remotes/origin/master
 </html>

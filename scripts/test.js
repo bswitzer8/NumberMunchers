@@ -294,8 +294,37 @@ munchersTest.gridTests.shouldDebugTheGrid = function () {
   munchersTest.gridTests.grid.debug();
   return true;
 }
+/*
+// FireBase Tests
+munchersTest.fireTests = {};
+var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/");
+var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
 
+munchersTest.fireTests.
+= function () { 
+	
 
+munchersTest.fireTests.testSubmit = function () {
+	munchers.leaderBoard.submitScore(Math.floor((Math.random() * 100) + 1),"John Doe","Rutherford");
+}
+munchersTest.fireTests.testAllTimeLowScore = function () {
+	munchers.fire.getLowScore_AllTime();
+}
+munchersTest.fireTests.testSchoolLowScore = function () {
+	munchers.fire.getLowScore_School("Rutherford");  
+}
+munchersTest.fireTests.testAlltimeEntryCount = function () {
+	munchers.fire.getEntryCount_AllTime();
+}
+munchersTest.fireTests.testSchoolEntryCount = function () {
+	munchers.fire.getEntryCount_School("Rutherford");  
+}
+munchersTest.fireTests.testTrimTheEnds_AllTime = function () {
+	munchers.fire.trimTheEnds_AllTime(); 
+}
+*/
+	
+	
 
 // RUN ALL TESTS HERE
 
@@ -407,4 +436,7 @@ window.onload = function () {
     'Grid.debug() prints the grid (see your console for the ouput)',
     munchersTest.gridTests.shouldDebugTheGrid()
   );
+  
 };
+	
+	
