@@ -1,0 +1,42 @@
+ // Leaderboard Firebase Tutorial: https://www.firebase.com/tutorial/#session/lvsn21ytt2j
+ ---------------------------------------------------------------------------------------------------------
+ 
+ Let's imagine that in our app, we often need to order the dinosaurs by name, height, and length, but never by weight. We can improve the performance of our queries by telling Firebase this information. Since the name of the dinosaurs are just the keys, Firebase already optimizes for queries by dinosaur name, since this is the key of the record. We can use .indexOn to tell Firebase to optimize queries for height and length as well:
+
+    {
+      "rules": {
+        "dinosaurs": {
+          ".indexOn": ["height", "length"]
+        }
+      }
+    }
+    
+    Since we're using orderByValue() to create the leaderboard, we can optimize our queries by adding a .value rule at our /scores node:
+
+    {
+      "rules": {
+        "scores": {
+          ".indexOn": ".value"
+        }
+      }
+    }
+---------------------------------------------------------------------------------------------------------
+ If a user adds a new post it would be stored as /posts/2. This would work if only a single author were adding posts, but in our collaborative blogging application many users may add posts at the same time. If two authors write to /posts/2 simultaneously, then one of the posts would be deleted by the other.
+
+To solve this, the Firebase JavaScript clients provide a push() function that generates a unique ID, or key, for each new child. By using unique child keys, several clients can add children to the same location at the same time without worrying about write conflicts. 
+ 
+In JavaScript, the pattern of calling push() and then immediately calling set() is so common that we let you combine them by passing the data to be set directly to push() as follows:
+   
+// This is equivalent to the calls to push().set(...) above
+var postsRef = ref.child("posts");
+      postsRef.push({
+        author: "gracehop",
+        title: "Announcing COBOL, a New Programming Language"
+      });
+      
+      munchers.leaderBoard.submitScore("99",userData.facebook.displayName,"Rutherford")
+      
+      var scoresRef = myDatabase.child("scores");
+      scoresRef.setWithPriority(newHighScore,newHighScore.score);
+      
+      var scoreListView = scoreListRef.limitToLast(LEADERBOARD_SIZE);

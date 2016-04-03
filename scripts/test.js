@@ -133,9 +133,9 @@ munchersTest.leaderBoardTests.shouldUseTodaysDate = function () {
 
   highScoreObject = munchers.leaderBoard.getScores()[0];
 
-  isTodaysYear  = highScoreObject.date.getFullYear() === todaysDate.getFullYear();
-  isTodaysMonth = highScoreObject.date.getMonth()    === todaysDate.getMonth();
-  isTodaysDate  = highScoreObject.date.getDate()     === todaysDate.getDate();
+  isTodaysYear  = highScoreObject.date.Year === todaysDate.getFullYear();
+  isTodaysMonth = highScoreObject.date.Month    === todaysDate.getMonth();
+  isTodaysDate  = highScoreObject.date.Day     === todaysDate.getDate();
 
   return isTodaysYear && isTodaysMonth && isTodaysDate;
 };
@@ -295,7 +295,69 @@ munchersTest.gridTests.shouldDebugTheGrid = function () {
   return true;
 }
 
+// FireBase Tests
+munchersTest.fireTests = {};
 
+munchersTest.fireTests.testSubmit = function () {
+	munchers.leaderBoard.submitScore(Math.floor((Math.random() * 100) + 1),"John Doe","score");
+}
+munchersTest.fireTests.testAllTimeLowScore = function () {
+
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  
+  return munchers.fire.getLowScore_AllTime().score === 1;
+}
+munchersTest.fireTests.testSchoolLowScore = function () {  
+
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  
+  return munchers.fire.getLowScore_AllTime().score === 1;
+}
+munchersTest.fireTests.testAlltimeEntryCount = function () {
+
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+	
+  return munchers.fire.getEntryCount_AllTime()===3;
+}
+munchersTest.fireTests.testSchoolEntryCount = function () {
+
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+	
+  return munchers.fire.getEntryCount_School("score")===3; 
+}
+munchersTest.fireTests.testTrimTheEnds_AllTime = function () {
+ 
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.fire.trimTheEnds_AllTime();
+  var countIsTwo = munchers.fire.getEntryCount_AllTime()===2;
+  var lowestScoreRemoved = munchers.fire.getLowScore_AllTime().score === 22;
+  return countIsTwo && lowestScoreRemoved;
+}
+munchersTest.fireTests.testTrimTheEnds_School = function(){
+  munchers.leaderBoard.clear();
+  munchers.leaderBoard.submitScore(22,  'second', 'score');
+  munchers.leaderBoard.submitScore(1,   'third',  'score');
+  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.fire.trimTheEnds_School('score');
+  var countIsTwo = munchers.fire.getEntryCount_School('score')===2;
+  var lowestScoreRemoved = munchers.fire.getLowScore_School('score').score === 22;
+  return countIsTwo && lowestScoreRemoved;
+}
 
 // RUN ALL TESTS HERE
 
@@ -406,5 +468,40 @@ window.onload = function () {
   munchersTest.logResult(
     'Grid.debug() prints the grid (see your console for the ouput)',
     munchersTest.gridTests.shouldDebugTheGrid()
+  );
+  
+  // GRID TESTS
+  munchersTest.describeBlock('The Database =>');
+  
+  /*
+  munchersTest.logResult(
+    '',
+
+  );
+  */
+  
+  munchersTest.logResult(
+    'All Time Low Score Returned Successfully',
+	munchersTest.fireTests.testAllTimeLowScore()
+  );
+  munchersTest.logResult(
+    'School Leaderboard Low Score Returned Successfully',
+	munchersTest.fireTests.testSchoolLowScore()
+  );
+  munchersTest.logResult(
+    'All time leadeboard entry count returned sucessfully',
+	munchersTest.fireTests.testAlltimeEntryCount()
+  );
+  munchersTest.logResult(
+    'School Leaderboard entry count returned successfully',
+	munchersTest.fireTests.testSchoolEntryCount()
+  );
+  munchersTest.logResult(
+    'Lowest score removed successfully from All Time Leaderboard',
+	munchersTest.fireTests.testTrimTheEnds_AllTime()
+  );
+  munchersTest.logResult(
+    'Lowest score removed successfully from School Leaderboard',
+	munchersTest.fireTests.testTrimTheEnds_School()
   );
 };

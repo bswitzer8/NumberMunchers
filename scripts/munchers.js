@@ -1,6 +1,10 @@
 // username: fsunumbermunchers@gmail.com
 // password: gotta munch em all
 
+var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/")
+var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
+//var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
+
 "use strict";
 
 // This object serves as a namespace for our custom code, thus preventing the
@@ -10,8 +14,6 @@ var userData;
 
 munchers.createMonster = function(){ return {}; };
 munchers.createPlayer = function(){ return { name: "player" } };
-
-
 
 /*
  *  Module      : Muncher's Grid
@@ -260,13 +262,58 @@ munchers.createLeaderBoard = function () {
       if (_score == null || _score == undefined || isNaN(_score)) {
         return false;
       } else {
+          
+        // If _playerName or _schoolName is blank, insert "Anonymous"
+            // Firebase push requires a defined value for all parameters
+        if (_playerName == null || _playerName == undefined){
+            _playerName = "Anonymous";
+        } 
+        if (_schoolName == null || _schoolName == undefined){
+            _schoolName = "Anonymous";
+        }
+        
+        // Create date object to pull strings from
+        var _date = new Date();
+        // Create new JSON date variable compatible with Firebase
+        var myDate = {
+            Year: _date.getFullYear(),
+            Month: _date.getMonth(),
+            Day: _date.getDate()
+        }  
+        // Create newHighScore object encapsilating new date object and player score information
         var newHighScore = {
           score:      _score,
           playerName: _playerName,
           schoolName: _schoolName,
-          date:       new Date()
+          date:       myDate
         };
-
+        
+        // Create new reference to school specific leaderboard
+        var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
+        
+        /*
+        // Check if All_Time_Leaderboard is full
+        if (munchers.fire.getAllTimeEntryCount() < 10){
+            allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
+        } else {
+            // Else if high score qualifies for All_TimeLeaderboard
+            if (munchers.fire.getLowScore_AllTime()._score < newHighScore.score){
+                allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
+                //trimTheEnds_AllTime();
+            }
+        }
+        // Check if School_Specific_Leaderboard is full
+        if (munchers.fire.getSchoolEntryCount(newHighScore.schoolName) <10){
+            schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
+        }else {
+            // Else if high score qualifies for School_Specific_Leaderboard
+            if (munchers.fire.getLowScore_School(newHighScore.schoolName) < newHighScore.score){
+                schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
+                //trimTheEnds_School(newHighScore.schoolName);
+            }
+        }
+        */
+        
         // Check if parameter score is higher than lowest score in array.
         var arrayIndexToInsert = highScores.findIndex(function (highScore) {
           if (_score > highScore.score) {
@@ -291,13 +338,21 @@ munchers.createLeaderBoard = function () {
         if (highScores.length > MAX_NUM_HIGH_SCORES) {
           highScores.pop();
         }
-                
+        
+        // Add score to the All Time Leaderboard
+        // var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
+        allTimeScoresRef.push(newHighScore).setPriority(newHighScore.score);
+        //Add score to School Specific Leaderboard
+        //var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + newHighScore.schoolName);
+        schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
+      
         return true;
       }  // end of if (score == null || score == undefined)
     },  // end of submitScore()
     
     clear: function () {
         highScores = [];
+        myDatabase.remove();
     }
   }  // end of created leaderboard object
 }  // end of createLeaderBoard()
@@ -308,14 +363,16 @@ munchers.leaderBoard = munchers.createLeaderBoard();
 munchers.grid = munchers.createGrid();
 
 /************************************************************************************
- *  Module      : Munchers Authentication Functions (authFunctions)
+ *  Module      : Munchers Firebase Functions (authentication & manipulation)
  *  Date Created: 3/26/16
  *  Author      : Nicholas Voran
  *  Description : 
  *      The Munchers Authentication Functions provide a method of authenticating
  *      a given user. During successful authentication, user data is provided by 
  *      Facebook in the form of of the authData object. This object contains useful 
- *      user data and authentication tokens to verify authentication at any time.
+ *      user data and authentication tokens to verify authentication at any time. The
+ *      non-authentications provide utilities with which to store, retrieve, and 
+ *      manipulate our data in Firebase.
  *  Documentation: Firebase Facebook Authentication 
  *      https://www.firebase.com/docs/web/guide/login/facebook.html
  *      The documentation above includes a listing of all member variables and 
@@ -329,11 +386,26 @@ munchers.grid = munchers.createGrid();
  *      logout() 
  *          Description: Deauthenticates the currrent Firebase session.
  *          Returns: N/A
+ *      getAllTimeLowScore()
+ *          Description: 
+ *          Returns:
+ *      getSchoolLowScore(_schoolName)
+ *          Description: 
+ *          Returns:
+        getAllTimeEntryCount()
+ *          Description: 
+ *          Returns:
+ *      getSchoolEntryCount(_schoolName)
+ *          Description: 
+ *          Returns:  
+ *      
  ***********************************************************************************/
-munchers.authFunctions = function(){
+ munchers.fireFunctions = function(){
+    var tempScore = {};
+    var tempCount;
     return {
-        // Purpose: Provide login functionality & aquire user data
-        // Function Call: munchers.auth.login()
+        // Purpose: log the user into application using Firebase Facebook authentication.
+        // Function Call: munchers.fire.login()
         login: function(){
             myDatabase.authWithOAuthPopup("facebook", function(error, authData){
                 if (error) {
@@ -343,21 +415,89 @@ munchers.authFunctions = function(){
                     // Assign user data to userData variable with munchers.js scope
                     userData = authData;
                     console.log("Authentication Successful:", userData.facebook.displayName);
-                    document.getElementById("WelcomeMessage").innerHTML = "Welcome " + userData.facebook.displayName + "!";
                 } // end else
             },{
                 remember: "sessionOnly"
             }); // end myDatabase.authWithOAuthPopup
+            
+           //document.getElementById("logout-link").style.display= "initial";
+           //document.getElementById("login-link").style.display= "none";
         }, // end login()
-        // log the user out and print to console for verification
+        
+        // Purpose: log the user out and print to console for verification.
+        // Function Call: munchers.fire.logout()
         logout: function(){
             myDatabase.unauth()
             {
                 console.log("Logout successful:", userData.facebook.displayName);
-                document.getElementById("WelcomeMessage").innerHTML = "Goodbye " + userData.facebook.displayName + "!";
             }; 
-        } // end logout()
-    }; // end definition of authFunctions object
-} // end authFunctions()
-// set munchers.auth name accessibility
-munchers.auth = munchers.authFunctions();
+            //document.getElementById("logout-link").style.display= "none";
+            //document.getElementById("login-link").style.display= "initial";
+        }, // end logout()
+        
+        // Purpose: Get lowest score (object) from All_Time_Leaderboard
+        // Function Call: munchers.fire.getLowScore_AllTime();
+        getLowScore_AllTime: function(){
+            allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
+            tempScore = snapshot.val();
+            });
+            return tempScore;  
+        }, // end 
+        
+        // Purpose: Get lowest score (object) from School_Specific_Leaderboard
+        // Function Call: munchers.fire.getLowScore_School(_schoolName); 
+        getLowScore_School: function(_schoolName){
+            var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
+            schoolScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
+            tempScore = snapshot.val();
+            });
+            return tempScore;
+        }, // end
+        
+        // Purpose: Get count of entries to All_Time_Leaderboard.
+        // Function Call: munchers.fire.getEntryCount_AllTime(); 
+        getEntryCount_AllTime: function(){
+           allTimeScoresRef.once("value", function(snapshot) {
+                tempCount = snapshot.numChildren();
+           });
+           return tempCount;
+        }, // end 
+        
+        // Purpose: Get count of entries to School_Specific_Leaderboard.
+        // Function Call: munchers.fire.getEntryCount_School(_schoolName);
+        getEntryCount_School: function (_schoolName){
+            var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
+            schoolScoresRef.once("value", function(snapshot) {
+                tempCount = snapshot.numChildren();
+           });
+           return tempCount; 
+        },
+        
+        // Purpose: 
+        // Function Call: trimTheEnds_AllTime();
+        trimTheEnds_AllTime: function (){
+           var tempKey;
+            allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
+                tempKey = snapshot.key();
+            });
+            allTimeScoresRef.child(tempKey).remove();
+        },
+        
+        // Purpose: 
+        // Function Call: trimTheEnds_School(_schoolName);
+       trimTheEnds_School: function (_schoolName){
+            var tempKey;
+            var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
+            schoolScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
+                tempKey = snapshot.key();   
+            });
+            schoolScoresRef.child(tempKey).remove();
+        }
+        
+        // Purpose: 
+        // Function Call: 
+        
+    }; // end definition of fireFunctions object
+} // end fireFunctions
+// set munchers.fire name accessibility
+munchers.fire = munchers.fireFunctions();
