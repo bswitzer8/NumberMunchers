@@ -10,7 +10,118 @@ var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
 // This object serves as a namespace for our custom code, thus preventing the
 // pollution of the global scope.
 var munchers = {};
+// userData stores the auth object which is returned by FaceBook authenication. This variable contains 
+// user information.
 var userData;
+// tableRows acts as a Table ID selector for any individual cell in the aray.
+var _tableRows = new Array(10);
+        for (var i = 0; i < 10; i++){
+            _tableRows[i] = new Array(3);
+        }
+        _tableRows[0][0] = "TR1TD1";
+        _tableRows[0][1] = "TR1TD2";
+        _tableRows[0][2] = "TR1TD3";
+        _tableRows[0][3] = "TR1TD4";
+        _tableRows[1][0] = "TR2TD1";
+        _tableRows[1][1] = "TR2TD2";
+        _tableRows[1][2] = "TR2TD3";
+        _tableRows[1][3] = "TR2TD4";
+        _tableRows[2][0] = "TR3TD1";
+        _tableRows[2][1] = "TR3TD2";
+        _tableRows[2][2] = "TR3TD3";
+        _tableRows[2][3] = "TR3TD4";
+        _tableRows[3][0] = "TR4TD1";
+        _tableRows[3][1] = "TR4TD2";
+        _tableRows[3][2] = "TR4TD3";
+        _tableRows[3][3] = "TR4TD4";
+        _tableRows[4][0] = "TR5TD1";
+        _tableRows[4][1] = "TR5TD2";
+        _tableRows[4][2] = "TR5TD3";
+        _tableRows[4][3] = "TR5TD4";
+        _tableRows[5][0] = "TR6TD1";
+        _tableRows[5][1] = "TR6TD2";
+        _tableRows[5][2] = "TR6TD3";
+        _tableRows[5][3] = "TR6TD4";
+        _tableRows[6][0] = "TR7TD1";
+        _tableRows[6][1] = "TR7TD2";
+        _tableRows[6][2] = "TR7TD3";
+        _tableRows[6][3] = "TR7TD4";
+        _tableRows[7][0] = "TR8TD1";
+        _tableRows[7][1] = "TR8TD2";
+        _tableRows[7][2] = "TR8TD3";
+        _tableRows[7][3] = "TR8TD4";
+        _tableRows[8][0] = "TR9TD1";
+        _tableRows[8][1] = "TR9TD2";
+        _tableRows[8][2] = "TR9TD3";
+        _tableRows[9][0] = "TR10TD1";
+        _tableRows[9][1] = "TR10TD2";
+        _tableRows[9][2] = "TR10TD3";
+        _tableRows[9][3] = "TR10TD4";
+var tableRows = _tableRows;
+
+/*
+<table style="width:100%">
+	<tr>
+        <td id="TR1TD1"></td>
+        <td id="TR1TD2"></td>
+        <td id="TR1TD3"></td>
+        <td id="TR1TD4"></td>
+    </tr>
+    <tr id="TR2">
+        <td id="TR2TD1"></td>
+        <td id="TR2TD2"></td>
+        <td id="TR2TD3"></td>
+        <td id="TR2TD4"></td>
+    </tr>
+    <tr id="TR3">
+        <td id="TR3TD1"></td>
+        <td id="TR3TD2"></td>
+        <td id="TR3TD3"></td>
+        <td id="TR3TD4"></td>
+    </tr>
+    <tr id="TR4">
+        <td id="TR4TD1"></td>
+        <td id="TR4TD2"></td>
+        <td id="TR4TD3"></td>
+        <td id="TR4TD4"></td>
+    </tr>
+    <tr id="TR5">
+        <td id="TR5TD1"></td>
+        <td id="TR5TD2"></td>
+        <td id="TR5TD3"></td>
+        <td id="TR5TD4"></td>
+    </tr>
+    <tr id="TR6">
+        <td id="TR6TD1"></td>
+        <td id="TR6TD2"></td>
+        <td id="TR6TD3"></td>
+        <td id="TR6TD4"></td>
+    </tr>
+    <tr id="TR7">
+        <td id="TR7TD1"></td>
+        <td id="TR7TD2"></td>
+        <td id="TR7TD3"></td>
+        <td id="TR7TD4"></td>
+    </tr>
+    <tr id="TR8">
+        <td id="TR8TD1"></td>
+        <td id="TR8TD2"></td>
+        <td id="TR8TD3"></td>
+        <td id="TR8TD4"></td>
+    </tr>
+    <tr id="TR9">
+        <td id="TR9TD1"></td>
+        <td id="TR9TD2"></td>
+        <td id="TR9TD3"></td>
+        <td id="TR9TD4"></td>
+    </tr>
+    <tr id="TR10">
+        <td id="TR10TD1"></td>
+        <td id="TR10TD2"></td>
+        <td id="TR10TD3"></td>
+        <td id="TR10TD4"></td>
+    </tr>
+*/
 
 munchers.createMonster = function(){ return {}; };
 munchers.createPlayer = function(){ return { name: "player" } };
@@ -192,16 +303,12 @@ munchers.createGrid = function () {
 /*
  *  Module      : Munchers' Leader Board
  *  Date Created: 3/22/2016
- *  Author      : Brent Miller
+ *  Author      : Brent Miller & Nicholas Voran
  *
- *  Description : 
- *  The leader board will house the game's high scores during runtime. It
- *  validates any score submitted to it and retains all valid scores that are
- *  the ten highest scores submitted to it during runtime. For now, the leader
- *  board module does not persist its scores - some other mechanism in the
- *  application will have to handle that responsibility. Technically speaking,
- *  the module is implemented as an encapsulated JavaScript object that stores
- *  the high scores as private member data.
+ *  Description : The Leaderboard is a FireBase-persisted top 10 leaderboard.
+ *      It is persisted using the munchers.fireFunctions() library, and requires
+ *      a minimum of a mere score to add a new score to the Leaderboard.
+ *  
  *  
  *  -- getScores() - returns a copy of the application's current high scores as
  *  an array of objects. A high score object follows the following template:
@@ -212,18 +319,16 @@ munchers.createGrid = function () {
  *    date: Date
  *  }
  *
- *  -- generateMultiple() - sets the _number variable to a random number
- *  between 2 and 11. This will be used to determine the multiples the 
- *  player must search for on the grid.
- *
- *  -- grid() - returns the _grid object.
- *
  *  -- submitScore() - accepts a score for submission to the leader board. It
  *  stores the score if (1) the parameters are valid AND (2a) the score is
  *  higher than the lowest current high score OR (2b) the leader board has not
  *  yet reached its defined maximum number of high scores.
  *
  *  -- clear() - purges the leader board of scores.
+ * 
+ * -- print_AllTime() - prints the All_Time_Leaderboard to an HTML table
+ * 
+ * -- print_School() - prints the School_Specific_Leaderboard to an HTML table
  */
 munchers.createLeaderBoard = function () {
   var MAX_NUM_HIGH_SCORES = 10;
@@ -232,8 +337,12 @@ munchers.createLeaderBoard = function () {
     // Return a copy of the high scores array. The score objects in the array
     // are also copies of the original array's scores, thus effectively
     // encapsulating the member data.
-    getScores: function () {
+    getScores_AllTime: function () {
        return munchers.fire.getScores_AllTime();
+    },
+    
+    getScores_School: function () {
+       return munchers.fire.getScores_School();
     },
         
     /* IF (1) the parameter score beats the lowest high score OR (2) the leader
@@ -247,17 +356,26 @@ munchers.createLeaderBoard = function () {
      * returns boolean: True means the score was added to the board, false
      *                  means it was not.
      */
-    submitScore: function (_score, _playerName, _schoolName) {
+    submitScore: function (_score, _schoolName) {
+      var userData = myDatabase.getAuth();
+      var _playerName;
+      
       // If the caller didn't pass in a valid score, just return false.
       if (_score == null || _score == undefined || isNaN(_score)) {
         return false;
       } else {
           
-        // If _playerName or _schoolName is blank, insert "Anonymous"
+        // If _schoolName is blank, insert "Anonymous"
+        // If user is not logged in, terminate
             // Firebase push requires a defined value for all parameters
-        if (_playerName == null || _playerName == undefined){
+        
+        if (!userData){
             _playerName = "Anonymous";
         } 
+        else {
+            _playerName = userData.facebook.displayName;
+        }
+        
         if (_schoolName == null || _schoolName == undefined){
             _schoolName = "Anonymous";
         }
@@ -307,8 +425,29 @@ munchers.createLeaderBoard = function () {
     // Clear all leaderboards - primarily for testing purposes.
     clear: function () {
         myDatabase.remove();
+    },
+    
+    print_AllTime: function () {
+         var leaderBoard = munchers.fire.getScores_AllTime();
+         var leaderBoardLength = leaderBoard.length; 
+         for (var i=0; i < leaderBoardLength; i++){
+            document.getElementById(tableRows[i][0]).innerHTML = leaderBoard[i].score;
+            document.getElementById(tableRows[i][1]).innerHTML = leaderBoard[i].playerName;
+            document.getElementById(tableRows[i][2]).innerHTML = leaderBoard[i].schoolName;
+            document.getElementById(tableRows[i][3]).innerHTML = leaderBoard[i].date.Month + "/" + leaderBoard[i].date.Day + "/" + leaderBoard[i].date.Year;
+         }
+         return true;
+    },
+    
+    print_School: function (_schoolName) {
+         var leaderBoard = munchers.fire.getScores_School(_schoolName);
+         var leaderBoardLength = leaderBoard.length; 
+         for (var i=0; i < leaderBoardLength; i++){
+             document.getElementById(tableRows[i]).innerHTML = leaderBoard[i].score + " " + leaderBoard[i].playerName + " " + leaderBoard[i].schoolName;
+         }
+         return true;
     }
-  }  // end of created leaderboard object
+  };  // end of created leaderboard object
 }  // end of createLeaderBoard()
 
 munchers.leaderBoard = munchers.createLeaderBoard();
@@ -372,19 +511,19 @@ munchers.grid = munchers.createGrid();
                 remember: "sessionOnly"
             }); // end myDatabase.authWithOAuthPopup
             
-           //document.getElementById("logout-link").style.display= "initial";
-           //document.getElementById("login-link").style.display= "none";
+           document.getElementById("logout-link").style.display= "initial";
+           document.getElementById("login-link").style.display= "none";
         }, // end login()
         
         // Purpose: log the user out and print to console for verification.
         // Function Call: munchers.fire.logout()
         logout: function(){
-            myDatabase.unauth()
+            myDatabase.unauth() 
             {
                 console.log("Logout successful:", userData.facebook.displayName);
             }; 
-            //document.getElementById("logout-link").style.display= "none";
-            //document.getElementById("login-link").style.display= "initial";
+            document.getElementById("logout-link").style.display= "none";
+            document.getElementById("login-link").style.display= "initial";
         }, // end logout()
         
         // Purpose: Get lowest score (object) from All_Time_Leaderboard
@@ -472,3 +611,17 @@ munchers.grid = munchers.createGrid();
 } // end fireFunctions
 // set munchers.fire name accessibility
 munchers.fire = munchers.fireFunctions();
+
+/*
+
+if (!userData){
+        munchers.fire.login();
+    }
+    if (userData) {
+        console.log("User " + userData.facebook.displayName + " is logged in with " + userData.provider);
+        munchersTest.RunTests();
+    } else {
+        console.log("User is logged out");
+    }
+
+*/
