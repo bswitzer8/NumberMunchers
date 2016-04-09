@@ -187,7 +187,7 @@ munchers.createGrid = function () {
   } // end of grid
 } // end of createGrid
 
-
+munchers.grid = munchers.createGrid();
 
 /*
  *  Module      : Munchers' Leader Board
@@ -255,27 +255,30 @@ munchers.createLeaderBoard = function () {
           
         // If _playerName or _schoolName is blank, insert "Anonymous"
             // Firebase push requires a defined value for all parameters
-        if (_playerName == null || _playerName == undefined){
+        if (_playerName == null || _playerName == undefined || _playerName === '') {
             _playerName = "Anonymous";
         } 
-        if (_schoolName == null || _schoolName == undefined){
+
+        if (_schoolName == null || _schoolName == undefined || _schoolName === '') {
             _schoolName = "Anonymous";
         }
         
         // Create date object to pull strings from
-        var _date = new Date();
+        var tempDate = new Date();
+
         // Create new JSON date boject compatible with Firebase
-        var myDate = {
-            Year: _date.getFullYear(),
-            Month: _date.getMonth(),
-            Day: _date.getDate()
+        var _date = {
+            Year:  tempDate.getFullYear(),
+            Month: tempDate.getMonth(),
+            Day:   tempDate.getDate()
         }  
+
         // Create newHighScore object encapsilating new date object and player score information
         var newHighScore = {
           score:      _score,
           playerName: _playerName,
           schoolName: _schoolName,
-          date:       myDate
+          date:       _date
         };
         
         // Create new reference to school specific leaderboard
@@ -291,6 +294,7 @@ munchers.createLeaderBoard = function () {
                 trimTheEnds_AllTime();
             }
         }
+
         // Check if School_Specific_Leaderboard is full
         if (munchers.fire.getEntryCount_School(newHighScore.schoolName) < MAX_NUM_HIGH_SCORES){
             schoolScoresRef.push(newHighScore).setPriority(newHighScore.score);
@@ -301,9 +305,11 @@ munchers.createLeaderBoard = function () {
                 trimTheEnds_School(newHighScore.schoolName);
             }
         }
+        
         return true;
       }  // end of if (score == null || score == undefined)
     },  // end of submitScore()
+
     // Clear all leaderboards - primarily for testing purposes.
     clear: function () {
         myDatabase.remove();
@@ -312,7 +318,6 @@ munchers.createLeaderBoard = function () {
 }  // end of createLeaderBoard()
 
 munchers.leaderBoard = munchers.createLeaderBoard();
-munchers.grid = munchers.createGrid();
 
 /************************************************************************************
  *  Module      : Munchers Firebase Functions (authentication & manipulation)
@@ -355,6 +360,7 @@ munchers.grid = munchers.createGrid();
  munchers.fireFunctions = function(){
     var tempScore = {};
     var tempCount;
+
     return {
         // Purpose: log the user into application using Firebase Facebook authentication.
         // Function Call: munchers.fire.login()
@@ -372,37 +378,38 @@ munchers.grid = munchers.createGrid();
                 remember: "sessionOnly"
             }); // end myDatabase.authWithOAuthPopup
             
-           //document.getElementById("logout-link").style.display= "initial";
-           //document.getElementById("login-link").style.display= "none";
+           document.getElementById("logout-link").style.display = "initial";
+           document.getElementById("login-link").style.display = "none";
         }, // end login()
         
         // Purpose: log the user out and print to console for verification.
         // Function Call: munchers.fire.logout()
         logout: function(){
-            myDatabase.unauth()
-            {
-                console.log("Logout successful:", userData.facebook.displayName);
-            }; 
-            //document.getElementById("logout-link").style.display= "none";
-            //document.getElementById("login-link").style.display= "initial";
+            myDatabase.unauth();
+            console.log("Logout successful:", userData.facebook.displayName); 
+            document.getElementById("logout-link").style.display = "none";
+            document.getElementById("login-link").style.display = "initial";
         }, // end logout()
         
         // Purpose: Get lowest score (object) from All_Time_Leaderboard
         // Function Call: munchers.fire.getLowScore_AllTime();
         getLowScore_AllTime: function(){
             allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
-            tempScore = snapshot.val();
+                tempScore = snapshot.val();
             });
+    
             return tempScore;  
         }, // end 
         
         // Purpose: Get lowest score (object) from School_Specific_Leaderboard
         // Function Call: munchers.fire.getLowScore_School(_schoolName); 
-        getLowScore_School: function(_schoolName){
+        getLowScore_School: function(_schoolName) {
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
+
             schoolScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
-            tempScore = snapshot.val();
+                tempScore = snapshot.val();
             });
+
             return tempScore;
         }, // end
         
@@ -412,6 +419,7 @@ munchers.grid = munchers.createGrid();
            allTimeScoresRef.once("value", function(snapshot) {
                 tempCount = snapshot.numChildren();
            });
+
            return tempCount;
         }, // end 
         
@@ -419,19 +427,23 @@ munchers.grid = munchers.createGrid();
         // Function Call: munchers.fire.getEntryCount_School(_schoolName);
         getEntryCount_School: function (_schoolName){
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
+
             schoolScoresRef.once("value", function(snapshot) {
                 tempCount = snapshot.numChildren();
-           });
-           return tempCount; 
+            });
+            
+            return tempCount; 
         },
         
         // Purpose: Remove the lowest score from the All_Time_Leaderboard
         // Function Call: munchers.fire.trimTheEnds_AllTime();
-        trimTheEnds_AllTime: function (){
-           var tempKey;
+        trimTheEnds_AllTime: function () {
+            var tempKey;
+
             allTimeScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
                 tempKey = snapshot.key();
             });
+
             allTimeScoresRef.child(tempKey).remove();
         },
         
@@ -440,35 +452,44 @@ munchers.grid = munchers.createGrid();
        trimTheEnds_School: function (_schoolName){
             var tempKey;
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _schoolName);
+
             schoolScoresRef.orderByChild("score").limitToFirst(1).on("child_added", function(snapshot) {
                 tempKey = snapshot.key();   
             });
+
             schoolScoresRef.child(tempKey).remove();
         },
+
         // Purpose: Return local copy of All_Time_Leaderboard
         // Function Call: munchers.fire.getScores_AllTime();
         getScores_AllTime: function () {
             var localCopy = [];
+
             allTimeScoresRef.once("value", function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
                     localCopy.unshift(childSnapshot.val());
                 });     
             });
-        return localCopy;
+            
+            return localCopy;
         },
+
         // Purpose: Return local copy of School_Specific_Leaderboard
         // Function Call: munchers.fire.getScores_School(_school);
         getScores_School: function (_school) {
             var schoolScoresRef = myDatabase.child("School_Specific_Leaderboards/" + _school);
             var localCopy = [];
+
             schoolScoresRef.once("value", function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
                     localCopy.unshift(childSnapshot.val());
                 });     
             });
-        return localCopy;
+    
+            return localCopy;
         }
     }; // end definition of fireFunctions object
 } // end fireFunctions
 // set munchers.fire name accessibility
+
 munchers.fire = munchers.fireFunctions();
