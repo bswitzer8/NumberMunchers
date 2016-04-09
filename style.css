@@ -14,8 +14,12 @@ body {
     display: flex;
 }
 
-a {
+a, #leader-board th {
     color: rgb(46, 219, 46);
+}
+
+a:link, a:visited {
+    text-decoration: none;
 }
 
 nav {
@@ -26,9 +30,6 @@ nav {
 
 nav h1 {
     margin-left: 20px;
-}
-
-nav h1 {
     font-size: 0.9em;
 }
 
@@ -37,11 +38,14 @@ nav ul {
 }
 
 nav ul li {
-    font-size: 0.8em;
     margin-bottom: 10px;
 }
 
-#logout-link {
+nav ul li, #leader-board td {
+    font-size: 0.8em;
+}
+
+#links__logout {
     display: none;  // override in the login() function
 }
 
@@ -50,4 +54,8 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#leader-board th, #leader-board td {
+    padding: 10px;
 }
