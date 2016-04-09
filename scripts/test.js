@@ -1,8 +1,6 @@
 // namespace for our unit tests
 var munchersTest = {};
 
-      
-
 // UTILITY FUNCTIONS
 
 // Add a header to the page for the next block of test results.
@@ -38,8 +36,8 @@ munchersTest.leaderBoardTests.shouldRejectNullScore = function () {
 
   munchers.leaderBoard.clear();
   
-  wasCallRejected = !munchers.leaderBoard.submitScore(null, 'player', 'school');
-  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  wasCallRejected = !munchers.leaderBoard.submitScore(null, 'school');
+  isBoardEmpty    = munchers.leaderBoard.getScores_AllTime().length === 0;
   
   return wasCallRejected && isBoardEmpty;
 };
@@ -50,8 +48,8 @@ munchersTest.leaderBoardTests.shouldRejectUndefinedScore = function () {
 
   munchers.leaderBoard.clear();
   
-  wasCallRejected = !munchers.leaderBoard.submitScore(undefined, 'player', 'school');
-  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  wasCallRejected = !munchers.leaderBoard.submitScore(undefined, 'school');
+  isBoardEmpty    = munchers.leaderBoard.getScores_AllTime().length === 0;
   
   return wasCallRejected && isBoardEmpty;
 };
@@ -62,8 +60,8 @@ munchersTest.leaderBoardTests.shouldRejectStringScore = function () {
 
   munchers.leaderBoard.clear();
   
-  wasCallRejected = !munchers.leaderBoard.submitScore('not a number', 'player', 'school');
-  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  wasCallRejected = !munchers.leaderBoard.submitScore('not a number', 'school');
+  isBoardEmpty    = munchers.leaderBoard.getScores_AllTime().length === 0;
   
   return wasCallRejected && isBoardEmpty;
 };
@@ -75,7 +73,7 @@ munchersTest.leaderBoardTests.shouldRejectEmptyScore = function () {
   munchers.leaderBoard.clear();
   
   wasCallRejected = !munchers.leaderBoard.submitScore();
-  isBoardEmpty    = munchers.leaderBoard.getScores().length === 0;
+  isBoardEmpty    = munchers.leaderBoard.getScores_AllTime().length === 0;
   
   return wasCallRejected && isBoardEmpty;
 };
@@ -86,8 +84,8 @@ munchersTest.leaderBoardTests.shouldAcceptValidScore = function () {
 
   munchers.leaderBoard.clear();
   
-  wasCallAccepted     = munchers.leaderBoard.submitScore(100, 'player', 'school');
-  doesBoardHaveAScore = munchers.leaderBoard.getScores().length > 0;
+  wasCallAccepted     = munchers.leaderBoard.submitScore(100, 'school');
+  doesBoardHaveAScore = munchers.leaderBoard.getScores_AllTime().length > 0;
   
   return wasCallAccepted && doesBoardHaveAScore;
 };
@@ -99,7 +97,7 @@ munchersTest.leaderBoardTests.shouldAcceptScoreWithoutNames = function () {
   munchers.leaderBoard.clear();
   
   wasCallAccepted     = munchers.leaderBoard.submitScore(100);
-  doesBoardHaveAScore = munchers.leaderBoard.getScores().length > 0;
+  doesBoardHaveAScore = munchers.leaderBoard.getScores_AllTime().length > 0;
   
   return wasCallAccepted && doesBoardHaveAScore;
 };
@@ -109,9 +107,9 @@ munchersTest.leaderBoardTests.shouldCreateHighScoreObjectWithCorrectProperties =
   var objectPropertyNames;
 
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(100, 'player', 'school');
+  munchers.leaderBoard.submitScore(100, 'school');
 
-  highScoreObject  = munchers.leaderBoard.getScores()[0];
+  highScoreObject  = munchers.leaderBoard.getScores_AllTime()[0];
   objectPropertyNames = Object.getOwnPropertyNames(highScoreObject);
   
   return objectPropertyNames.length   === 4 &&
@@ -129,9 +127,9 @@ munchersTest.leaderBoardTests.shouldUseTodaysDate = function () {
   var isTodaysDate;
 
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(100, 'player', 'school');
+  munchers.leaderBoard.submitScore(100, 'school');
 
-  highScoreObject = munchers.leaderBoard.getScores()[0];
+  highScoreObject = munchers.leaderBoard.getScores_AllTime()[0];
 
   isTodaysYear  = highScoreObject.date.Year === todaysDate.getFullYear();
   isTodaysMonth = highScoreObject.date.Month    === todaysDate.getMonth();
@@ -146,13 +144,13 @@ munchersTest.leaderBoardTests.shouldSortHighScoresByScore = function () {
   var isThirdScoreThird;
   
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22, 'score');
+  munchers.leaderBoard.submitScore(1,  'score');
+  munchers.leaderBoard.submitScore(333,  'score');
   
-  isFirstScoreFirst   = munchers.leaderBoard.getScores()[0].playerName === 'first';
-  isSecondScoreSecond = munchers.leaderBoard.getScores()[1].playerName === 'second';
-  isThirdScoreThird   = munchers.leaderBoard.getScores()[2].playerName === 'third';
+  isFirstScoreFirst   = munchers.leaderBoard.getScores_AllTime()[0].score === 333;
+  isSecondScoreSecond = munchers.leaderBoard.getScores_AllTime()[1].score === 22;
+  isThirdScoreThird   = munchers.leaderBoard.getScores_AllTime()[2].score === 1;
 
   return isFirstScoreFirst && isSecondScoreSecond && isThirdScoreThird;
 }
@@ -168,7 +166,7 @@ munchersTest.leaderBoardTests.shouldEnforceMaxNumOfScores = function () {
     ++numScoresSubmitted;
   }
   
-  numScoresStored = munchers.leaderBoard.getScores().length;
+  numScoresStored = munchers.leaderBoard.getScores_AllTime().length;
   
   return numScoresSubmitted === 11 && numScoresStored === 10;
 }
@@ -182,31 +180,20 @@ munchersTest.leaderBoardTests.shouldEncapsulateHighScoresArray = function () {
     munchers.leaderBoard.hasOwnProperty('highScores') === false;
   
   munchers.leaderBoard.clear();
-  copyOfArray = munchers.leaderBoard.getScores();  
-  munchers.leaderBoard.submitScore(333, 'first', 'score');
-  doChangesPropogate = copyOfArray.length === munchers.leaderBoard.getScores().length;
+  copyOfArray = munchers.leaderBoard.getScores_AllTime();  
+  munchers.leaderBoard.submitScore(333, 'score');
+  doChangesPropogate = copyOfArray.length === munchers.leaderBoard.getScores_AllTime().length;
 
   return isHighScoresArrayPrivate && !doChangesPropogate;
 }
 
-
-munchersTest.leaderBoardTests.shouldEncapsulateHighScoresObjects = function () {
-  var copyOfAHighScore;
-  var doChangesPropogate;
-    
-  munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(333, 'first', 'score');
-  
-  copyOfAHighScore = munchers.leaderBoard.getScores()[0];
-  copyOfAHighScore.playerName = 'changed name';
-  
-  doChangesPropogate =
-    copyOfAHighScore.playerName === munchers.leaderBoard.getScores()[0].playerName;
-
-  return !doChangesPropogate;
+munchersTest.leaderBoardTests.shouldPrintLeaderboardTable = function () {
+    munchers.leaderBoard.clear();
+    munchers.leaderBoard.submitScore(22, 'score');
+    munchers.leaderBoard.submitScore(1,  'score');
+    munchers.leaderBoard.submitScore(333,  'score');
+    return munchers.leaderBoard.print_AllTime();
 }
-
-
 
 // GRID TESTS
 
@@ -299,50 +286,50 @@ munchersTest.gridTests.shouldDebugTheGrid = function () {
 munchersTest.fireTests = {};
 
 munchersTest.fireTests.testSubmit = function () {
-	munchers.leaderBoard.submitScore(Math.floor((Math.random() * 100) + 1),"John Doe","score");
+	munchers.leaderBoard.submitScore(Math.floor((Math.random() * 100) + 1), "score");
 }
 munchersTest.fireTests.testAllTimeLowScore = function () {
 
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22, 'score');
+  munchers.leaderBoard.submitScore(1, 'score');
+  munchers.leaderBoard.submitScore(333, 'score');
   
   return munchers.fire.getLowScore_AllTime().score === 1;
 }
 munchersTest.fireTests.testSchoolLowScore = function () {  
 
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22, 'score');
+  munchers.leaderBoard.submitScore(1, 'score');
+  munchers.leaderBoard.submitScore(333,   'score');
   
   return munchers.fire.getLowScore_AllTime().score === 1;
 }
 munchersTest.fireTests.testAlltimeEntryCount = function () {
 
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22,  'score');
+  munchers.leaderBoard.submitScore(1, 'score');
+  munchers.leaderBoard.submitScore(333,  'score');
 	
   return munchers.fire.getEntryCount_AllTime()===3;
 }
 munchersTest.fireTests.testSchoolEntryCount = function () {
 
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22, 'score');
+  munchers.leaderBoard.submitScore(1, 'score');
+  munchers.leaderBoard.submitScore(333, 'score');
 	
   return munchers.fire.getEntryCount_School("score")===3; 
 }
 munchersTest.fireTests.testTrimTheEnds_AllTime = function () {
  
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22, 'score');
+  munchers.leaderBoard.submitScore(1, 'score');
+  munchers.leaderBoard.submitScore(333, 'score');
   munchers.fire.trimTheEnds_AllTime();
   var countIsTwo = munchers.fire.getEntryCount_AllTime()===2;
   var lowestScoreRemoved = munchers.fire.getLowScore_AllTime().score === 22;
@@ -350,9 +337,9 @@ munchersTest.fireTests.testTrimTheEnds_AllTime = function () {
 }
 munchersTest.fireTests.testTrimTheEnds_School = function(){
   munchers.leaderBoard.clear();
-  munchers.leaderBoard.submitScore(22,  'second', 'score');
-  munchers.leaderBoard.submitScore(1,   'third',  'score');
-  munchers.leaderBoard.submitScore(333, 'first',  'score');
+  munchers.leaderBoard.submitScore(22, 'score');
+  munchers.leaderBoard.submitScore(1, 'score');
+  munchers.leaderBoard.submitScore(333, 'score');
   munchers.fire.trimTheEnds_School('score');
   var countIsTwo = munchers.fire.getEntryCount_School('score')===2;
   var lowestScoreRemoved = munchers.fire.getLowScore_School('score').score === 22;
@@ -360,8 +347,7 @@ munchersTest.fireTests.testTrimTheEnds_School = function(){
 }
 
 // RUN ALL TESTS HERE
-
-window.onload = function () {
+munchersTest.RunTests = function () {    
   // LEADER BOARD TESTS
   munchersTest.describeBlock('The Leader Board =>');
 
@@ -414,18 +400,16 @@ window.onload = function () {
     'Should enforce a max number of high scores',
     munchersTest.leaderBoardTests.shouldEnforceMaxNumOfScores()
   );
-  
+
   munchersTest.logResult(
-    'Should encapsulate the high scores array',
+    'Should encapsulate the high scores objects',
     munchersTest.leaderBoardTests.shouldEncapsulateHighScoresArray()
   );
 
   munchersTest.logResult(
-    'Should encapsulate the high scores objects',
-    munchersTest.leaderBoardTests.shouldEncapsulateHighScoresObjects()
+    'Should print leaderboard table',
+    munchersTest.leaderBoardTests.shouldPrintLeaderboardTable()
   );
-
-
   
   // GRID TESTS
   munchersTest.describeBlock('The Grid =>');
@@ -497,4 +481,9 @@ window.onload = function () {
     'Lowest score removed successfully from School Leaderboard',
 	munchersTest.fireTests.testTrimTheEnds_School()
   );
-};
+}
+
+window.onload = function () {
+    var userData = myDatabase.getAuth();
+    munchersTest.RunTests();
+};  
