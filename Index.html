@@ -2,7 +2,7 @@
 <html>
 	<head>
         <meta charset="UTF-8" />
-        <title>Number Munchers!</title>
+        <title>Number Munchers Game</title>
 
         <link rel="stylesheet" type="text/css" href="style.css"></link>
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>
@@ -44,18 +44,17 @@
             };
    		</script>
 	</head>
+
     <body>
-        <!-- This is where the body goes...  -->
-	</body>
         <nav>
             <h1>Return of the Number Munchers</h1>
             
             <ul>
-                <li><a id="login-link"  onclick="munchers.fire.login()" >Log In</a></li>
-                <li><a id="logout-link" onclick="munchers.fire.logout()">Log Out</a></li>
-                <li><a>New Game</a></li>
-                <li><a>View Leader Board</a></li>
-                <li><a id="test-runner" onclick="window.location.href='test-runner.html'">View test-runner.html</a></li>
+                <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
+                <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()">Log Out</a></li>
+                <li><a id="links__game"         href="Index.html"       >New Game</a></li>
+                <li><a id="links__leader-board" href="leader-board.html">View Leader Board</a></li>
+                <li><a id="links__unit-tests"   href="test-runner.html" >View Unit Tests</a></li>
             </ul>
         </nav>
         
