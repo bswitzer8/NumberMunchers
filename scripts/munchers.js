@@ -51,8 +51,8 @@ munchers.createPlayer = function(){ return { name: "player" } };
  */
 munchers.createGrid = function () {
   // Height and Width of the grid.
-  var GRID_HEIGHT = 6;
-  var GRID_WIDTH = 5;
+  var GRID_HEIGHT = 5;
+  var GRID_WIDTH = 6;
   
   // the grid array
   var _grid = [];
@@ -63,6 +63,10 @@ munchers.createGrid = function () {
  return {
     // This function is used to generate a monster onto the board
     // from a corner of the board.
+    blank: function (x, y) {
+      if(x > GRID_WIDTH || y > GRID_HEIGHT || x < 0 || y < 0) return;
+      _grid[x][y] = "";
+    },
     generateMonster: function () {
         // position to generate troggle
         var h = 0, w = 0;
@@ -151,6 +155,21 @@ munchers.createGrid = function () {
           _grid[w][h] = '';
         }
       }
+    },
+
+    winCheck: function () {
+      for(var w = 0; w < GRID_WIDTH; ++w)
+      {
+        for(var h = 0; h < GRID_HEIGHT; ++h)
+        {
+          if (_grid[w][h] != "" && _grid[w][h] % _number === 0)
+          {
+            return false; 
+          }
+        }
+      }
+
+      return true;
     },
 
     /*
