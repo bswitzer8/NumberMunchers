@@ -11,7 +11,31 @@ body {
     background-color: #000000;
     color: #888888;
     font-family: 'Press Start 2P', cursive;    
+}
+
+main {
+    float:right;
+    width: 75%;
     display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer {
+    float:right;
+    width:75%;
+    background-color: #000000;
+    color: #888888;
+    font-family: 'Press Start 2P', cursive;    
+}
+
+nav {
+    float:left;
+    height: 100%;
+    width: 25%;
+    background-color: #222222;
+    color: #888888;
+    font-family: 'Press Start 2P', cursive;
 }
 
 a, #leader-board th {
@@ -20,12 +44,6 @@ a, #leader-board th {
 
 a:link, a:visited {
     text-decoration: none;
-}
-
-nav {
-    background-color: #222222;
-    height: 100%;
-    width: 25%
 }
 
 nav h1 {
@@ -46,14 +64,7 @@ nav ul li, #leader-board td {
 }
 
 #links__logout {
-    display: none;  // override in the login() function
-}
-
-main {
-    width: 75%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: none;
 }
 
 #leader-board th, #leader-board td {

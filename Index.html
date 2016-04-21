@@ -3,19 +3,13 @@
 	<head>
         <meta charset="UTF-8" />
         <title>Number Munchers Game</title>
-
         <link rel="stylesheet" type="text/css" href="style.css"></link>
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>
-
         <script src="scripts/phaser.js"></script>
         <script src="scripts/firebase.js"></script>
         <script src="scripts/munchers.js"></script>
 
         <script type="text/javascript">
-            // This is a reference to our firebase. 
-            var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com/");
-            var allTimeScoresRef = myDatabase.child("All_Time_Leaderboard");
-            
             munchers.grid.generateMultiple();
             munchers.grid.fill();
             munchers.grid.generateMonster();
@@ -44,20 +38,16 @@
             };
    		</script>
 	</head>
-
     <body>
         <nav>
             <h1>Return of the Number Munchers</h1>
-            
             <ul>
                 <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
                 <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()">Log Out</a></li>
                 <li><a id="links__game"         href="Index.html"       >New Game</a></li>
                 <li><a id="links__leader-board" href="leader-board.html">View Leader Board</a></li>
-                <li><a id="links__unit-tests"   href="test-runner.html" >View Unit Tests</a></li>
             </ul>
         </nav>
-        
         <main id="phaser-canvas"></main>
     </body>
 </html>

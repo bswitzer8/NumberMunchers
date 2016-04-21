@@ -3,73 +3,105 @@
   <head>
     <meta charset="UTF-8" />
     <title>Unit Test Runner</title>
-    
+    <link rel="stylesheet" type="text/css" href="style.css"></link>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>  
 	<script src="scripts/phaser.js"></script>
     <script src="scripts/firebase.js"></script>
     <script src="scripts/munchers.js"></script>
-    <script src="scripts/test.js"></script><!-- The test script must be loaded after the production code script. -->
-  </head>
-  <body>
-	<table style="width:100%">
-	<tr>
-        <td id="TR1TD1"></td>
-        <td id="TR1TD2"></td>
-        <td id="TR1TD3"></td>
-        <td id="TR1TD4"></td>
-    </tr>
-    <tr id="TR2">
-        <td id="TR2TD1"></td>
-        <td id="TR2TD2"></td>
-        <td id="TR2TD3"></td>
-        <td id="TR2TD4"></td>
-    </tr>
-    <tr id="TR3">
-        <td id="TR3TD1"></td>
-        <td id="TR3TD2"></td>
-        <td id="TR3TD3"></td>
-        <td id="TR3TD4"></td>
-    </tr>
-    <tr id="TR4">
-        <td id="TR4TD1"></td>
-        <td id="TR4TD2"></td>
-        <td id="TR4TD3"></td>
-        <td id="TR4TD4"></td>
-    </tr>
-    <tr id="TR5">
-        <td id="TR5TD1"></td>
-        <td id="TR5TD2"></td>
-        <td id="TR5TD3"></td>
-        <td id="TR5TD4"></td>
-    </tr>
-    <tr id="TR6">
-        <td id="TR6TD1"></td>
-        <td id="TR6TD2"></td>
-        <td id="TR6TD3"></td>
-        <td id="TR6TD4"></td>
-    </tr>
-    <tr id="TR7">
-        <td id="TR7TD1"></td>
-        <td id="TR7TD2"></td>
-        <td id="TR7TD3"></td>
-        <td id="TR7TD4"></td>
-    </tr>
-    <tr id="TR8">
-        <td id="TR8TD1"></td>
-        <td id="TR8TD2"></td>
-        <td id="TR8TD3"></td>
-        <td id="TR8TD4"></td>
-    </tr>
-    <tr id="TR9">
-        <td id="TR9TD1"></td>
-        <td id="TR9TD2"></td>
-        <td id="TR9TD3"></td>
-        <td id="TR9TD4"></td>
-    </tr>
-    <tr id="TR10">
-        <td id="TR10TD1"></td>
-        <td id="TR10TD2"></td>
-        <td id="TR10TD3"></td>
-        <td id="TR10TD4"></td>
-    </tr>
-  </body>
+    <script src="scripts/test.js"></script><!-- The test script must be loaded after the production code script. -->  
+</head>  
+   <body>
+        <nav>
+            <h1>Return of the Number Munchers</h1>
+                <ul>
+                    <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
+                    <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()">Log Out</a></li>
+                    <li><a id="links__game"         href="Index.html"       >New Game</a></li>
+                    <li><a id="links__leader-board" href="leader-board.html">View Leader Board</a></li>
+                </ul>
+        </nav>
+        <main id="leader-board">  
+            <table>
+                <thead>
+                    <tr>
+                        <th id="header__player">Player</th>
+                        <th id="header__school">School</th>
+                        <th id="header__score" >Score</th>
+                        <th id="header__date"  >Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="row-1__player"></td>
+                        <td id="row-1__school"></td>
+                        <td id="row-1__score" ></td>
+                        <td id="row-1__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-2__player"></td>
+                        <td id="row-2__school"></td>
+                        <td id="row-2__score" ></td>
+                        <td id="row-2__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-3__player"></td>
+                        <td id="row-3__school"></td>
+                        <td id="row-3__score" ></td>
+                        <td id="row-3__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-4__player"></td>
+                        <td id="row-4__school"></td>
+                        <td id="row-4__score" ></td>
+                        <td id="row-4__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-5__player"></td>
+                        <td id="row-5__school"></td>
+                        <td id="row-5__score" ></td>
+                        <td id="row-5__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-6__player"></td>
+                        <td id="row-6__school"></td>
+                        <td id="row-6__score" ></td>
+                        <td id="row-6__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-7__player"></td>
+                        <td id="row-7__school"></td>
+                        <td id="row-7__score" ></td>
+                        <td id="row-7__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-8__player"></td>
+                        <td id="row-8__school"></td>
+                        <td id="row-8__score" ></td>
+                        <td id="row-8__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-9__player"></td>
+                        <td id="row-9__school"></td>
+                        <td id="row-9__score" ></td>
+                        <td id="row-9__date"  ></td>
+                    </tr>
+
+                    <tr>
+                        <td id="row-10__player"></td>
+                        <td id="row-10__school"></td>
+                        <td id="row-10__score" ></td>
+                        <td id="row-10__date"  ></td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </body>
 </html>
