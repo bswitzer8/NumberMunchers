@@ -1,29 +1,45 @@
 <!DOCTYPE html>
 <html>
-	<head>
+    <head>
         <meta charset="UTF-8" />
         <title>Number Munchers Leader Board</title>
-
         <link rel="stylesheet" type="text/css" href="style.css"></link>
-        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>
-
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Press+Start+2P"></link>  
+        <script src="scripts/phaser.js"></script>        
+        <script src="scripts/firebase.js"></script>
         <script src="scripts/munchers.js"></script>
-    </head>
-    
+        <script>
+            addOnLoad(function(){munchers.fire.setAuth();});
+            addOnLoad(function(){window.setTimeout(munchers.leaderBoard.print, 500);});
+            function addOnLoad(newFunction){
+                var oldOnLoad = window.onload;
+
+                if(typeof oldOnLoad == "function"){
+                    window.onload = function(){
+                        if(oldOnLoad){
+                            oldOnLoad();
+                        }
+                        newFunction();
+                    }
+                }
+                else{
+                    window.onload = newFunction;
+                }
+            }
+            
+        </script>
+    </head> 
     <body>
         <nav>
             <h1>Return of the Number Munchers</h1>
-            
-            <ul>
-                <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
-                <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()">Log Out</a></li>
-                <li><a id="links__game"         href="Index.html"       >New Game</a></li>
-                <li><a id="links__leader-board" href="leader-board.html">View Leader Board</a></li>
-                <li><a id="links__unit-tests"   href="test-runner.html" >View Unit Tests</a></li>
-            </ul>
+                <ul>
+                    <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
+                    <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()"></a></li>
+                    <li><a id="links__game"         href="Index.html"                        >Return to Main Screen</a></li>
+                    <li><a id="links__leader-board" href="leader-board.html"                 >Refresh Leader Board</a></li>
+                </ul>
         </nav>
-        
-        <main id="leader-board">
+        <main id="leader-board">  
             <table>
                 <thead>
                     <tr>
@@ -33,7 +49,6 @@
                         <th id="header__date"  >Date</th>
                     </tr>
                 </thead>
-                
                 <tbody>
                     <tr>
                         <td id="row-1__player"></td>
