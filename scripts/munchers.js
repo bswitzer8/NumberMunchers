@@ -1,4 +1,3 @@
-
 "use strict";
 // username: fsunumbermunchers@gmail.com
 // password: gotta munch em all
@@ -263,7 +262,7 @@ munchers.createGrid = function () {
       }
     }
 
-  }; // end of grid
+  } // end of grid
 } 
 munchers.grid = munchers.createGrid();
 
@@ -549,19 +548,6 @@ munchers.leaderBoard = munchers.createLeaderBoard();
 } 
 munchers.fire = munchers.fireFunctions();
 
-
-var grid = munchers.grid.grid();
-          
-var multipleOf = munchers.grid.number();
-
-var troggleRate = 2.5, troggleRateCount = 0; // every 5 seconds at first
-
-var muncher, troggle = [];
-var gridText = [];
-var score = 0, lives = 3, level = 1;
-var scoreText, scoreString, liveText, 
-liveString, levelString, levelText, multipleString, multipleText;
-
 munchers.phaserFunctions = function(){
     var confirmed;
     return {
@@ -588,23 +574,30 @@ munchers.phaserFunctions = function(){
         // Purpose: Load new phaser.io Game to "phaser-canvas" html block
         // Function Call: munchers.phaser.loadPhaser();
         loadPhaser: function(){
-            // I want to play a game. </saw>
-                var game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
+                // I want to play a game. </saw>
+                game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
+
                 function preload () {                
                     game.load.image("muncher", "assets/muncher.svg");
                     game.load.image("troggle", "assets/troggle.svg");
-                    
+                    game.load.image("overlay1", "assets/eatenoverlay.png");
+
                     game.stage.backgroundColor = "#000"
+
                     game.time.events.loop(Phaser.Timer.SECOND * 2, spawn, this);
                 }
                 function create () {
-                    // sprites
+
+
+
                     muncher = game.add.sprite( 0, 0, "muncher");
                     muncher.gridX = 2;
                     muncher.gridY = 2;
                     placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+
                     muncher.scale.setTo(0.5, 0.5); // set scale, go!
                     
+
                     for(var x = 0; x < grid.length; ++x)
                     {
                         gridText[x] = [];
@@ -620,30 +613,48 @@ munchers.phaserFunctions = function(){
                             gridText[x][y].setVisable = true;
                             }
                         }
+
                     }
                    
+
                     // Text
                     scoreString = "Score: ";
                     scoreText = game.add.text(10, game.world.height - 40, scoreString + score, { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"});
                     scoreText.setVisable = true;
+
                     liveString = "Lives: ";
                     liveText = game.add.text(game.world.centerX + 100, game.world.height - 40, liveString + lives, { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"});
                     liveText.setVisable = true;
+
                     levelString = "Level: "
                     levelText = game.add.text(10, 10, levelString + "1", { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"  });
                     levelText.setVisable = true;
+
                     multipleString = "Multiples of ";
                     multipleText = game.add.text(game.world.centerX - 70, 10, multipleString + multipleOf,  { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"  });
+
+                      // sprites
+                    overlay = game.add.sprite(160, game.world.centerY - 40, "overlay1");
+                    overlay.visible = false;
                 }
+
                 function update() {
                     
                     game.input.keyboard.onUpCallback = function(e)
                     {    
+                        if(e.key === "Enter" && game.paused && lives > 0)
+                        {
+                            overlay.visible = false;
+                            game.paused = false;
+                        }
                         if(game.paused) return; // paused game, go no further.
+
+
                         var yy = muncher.gridY;
                         var xx = muncher.gridX;
+
                         // hacky: bringing back the text back from the abyss.
-                        gridText[xx][yy].x -= 1000;
+                        gridText[xx][yy].visible = true;
                                
                          
                         if(e.key === "ArrowUp"){ 
@@ -688,19 +699,34 @@ munchers.phaserFunctions = function(){
                                     gameOver();
                                     return;
                                 }
+
                             }
+
                             munchers.grid.debug();
                         }
-                    
-                        // hacky hiding of the text the muncher is on. 
-                        gridText[muncher.gridX][muncher.gridY].x += 1000;  
+                        
+                        for(var i = 0; i < troggle.length; ++i)
+                        {
+                            if(troggle[i].gridX == muncher.gridX && troggle[i].gridY == muncher.gridY)
+                            {
+                                console.log("NEGATIVE LIVES FOR THE MUNCHER");
+                                collide();
+                                return;
+                            }
+                        }
+
+
+                        gridText[muncher.gridX][muncher.gridY].visible = false; 
                     }
+
                   
                 }
+
                 function spawn()
                 {
                     
                     moveTroggles(troggle);
+
                     troggleRateCount += .5;
                     console.log(troggle);
                     if(troggleRateCount >= troggleRate)
@@ -712,24 +738,57 @@ munchers.phaserFunctions = function(){
                         var coord = munchers.grid.generateMonster();
                         troggle[pos].gridX = coord[0];
                         troggle[pos].gridY = coord[1];
-                        gridText[troggle[pos].gridX][troggle[pos].gridY].x += 1000
+                        gridText[troggle[pos].gridX][troggle[pos].gridY].visible = true;
                         placeOnGridAt(troggle[pos], troggle[pos].gridX, troggle[pos].gridY);
                         troggleRateCount = 0;
                     }
                 }
+
+                function collide() {
+                    
+                    overlay.visible = true;
+                    game.paused = true;
+                    for(var i = 0; i < troggle.length; ++i)
+                    {
+                        troggle[i].destroy();
+                        troggle.splice(i, 1);
+                    }
+
+                    --lives;
+                    if(lives == 0)
+                    {
+                        gameOver();
+                        return;
+                    }
+
+                    liveText.text = liveString + lives;
+
+                    muncher.gridX = 2;
+                    muncher.gridY = 2;
+                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+
+                   
+
+                }
+
                 function levelUp(){
+
                     ++level;                   
                     if(score % 5000 == 0 && lives < 3) lives += 1;
                     if(troggleRate > 2.5) troggleRate -= .5;       // more frequent troggles 
+
                     // new game stuff.
                     munchers.grid.generateMultiple();
                     munchers.grid.fill();
+
                     grid = munchers.grid.grid();
           
                     multipleOf = munchers.grid.number();
+
                     levelText.text = levelString + level;
                     multipleText.text = multipleString + multipleOf;
                     liveText.text = liveString + lives;
+
                     for(var x = 0; x < grid.length; ++x)
                     {
                         for(var y = 0; y < grid[x].length; ++y)
@@ -741,24 +800,29 @@ munchers.phaserFunctions = function(){
                             else {
                                 gridText[x][y].text = grid[x][y];
                                 
-                                gridText[x][y].setVisable = true;
+                                gridText[x][y].visible = true;
                             }
                         }
                     }
+
                     muncher.gridX = 2;
                     muncher.gridY = 2;
                     placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+
+
                     game.paused = false;
                 }
+
                 function moveTroggles(troggles) {
                     ///       0
                     ///     1   2     
                     ///       3
+
                     for(var i = 0; i < troggles.length; ++i)
                     {
                         var choice = parseInt(Math.random() * 4);
                        
-                        gridText[troggles[i].gridX][troggles[i].gridY].x -= 1000; // vanish it
+                        gridText[troggles[i].gridX][troggles[i].gridY].visible = true; // vanish it
                         
                         
                         if(choice === 0 && troggles[i].gridY > 0)               // 0 up
@@ -775,10 +839,20 @@ munchers.phaserFunctions = function(){
                             troggles.splice(i, 1);
                             return; // go no further
                         }
-                        gridText[troggles[i].gridX][troggles[i].gridY].x += 1000;
+
+                        if(troggles[i].gridX == muncher.gridX && troggles[i].gridY == muncher.gridY)
+                        {
+                            console.log("NEGATIVE LIVES FOR THE MUNCHER");
+                            collide();
+                        }
+
+                        gridText[troggles[i].gridX][troggles[i].gridY].visible = false;
                         placeOnGridAt(troggles[i], troggles[i].gridX, troggles[i].gridY);
                     }
+
+
                 }
+
                 function placeOnGridAt(item, x, y)
                 {
                   
@@ -795,16 +869,16 @@ munchers.phaserFunctions = function(){
                     }
                        
                 }
+
                 function gameOver() {
+                    console.log("It's all over now");
                     // Display End game overlay
+
                     // Submit to the leader board
+
                     // prompt to play a game?
                 }
         }
     };
 }
 munchers.phaser = munchers.phaserFunctions();
-
-
-
-

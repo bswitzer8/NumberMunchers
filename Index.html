@@ -10,10 +10,8 @@
         <script src="scripts/munchers.js"></script>
 
         <script type="text/javascript">
-            /*
             munchers.grid.generateMultiple();
             munchers.grid.fill();
-            
             var grid = munchers.grid.grid();
           
             var multipleOf = munchers.grid.number();
@@ -21,17 +19,17 @@
             var troggleRate = 2.5, troggleRateCount = 0; // every 5 seconds at first
 
             var muncher, troggle = [];
-            //var gridText = [];
+            var gridText = [];
             var score = 0, lives = 3, level = 1;
             var scoreText, scoreString, liveText, 
             liveString, levelString, levelText, multipleString, multipleText;
-            */
-            
+            var overlay;
+
             window.onload = function() {
                 // Initiate authentication features
-                window.setTimeout(munchers.fire.setAuth(), 500);
+                munchers.fire.setAuth();
                 // Load Phaser.io Game
-                window.setTimeout(munchers.phaser.newGame(), 1000);
+                munchers.phaser.newGame();
             };
    		</script>
 	</head>
@@ -44,6 +42,9 @@
                 <li><a id="links__game"         href="#" onclick="munchers.phaser.newGame()">New Game</a></li>
                 <li><a id="links__leader-board" href="leader-board.html"                    >View Leader Board</a></li>
             </ul>
+
+            <br>
+           
         </nav>
 
         <main id="phaser-canvas"></main>
