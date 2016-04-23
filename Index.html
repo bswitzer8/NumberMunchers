@@ -22,10 +22,10 @@
           
             var multipleOf = munchers.grid.number();
 
+            var troggleRate = 2.5, troggleRateCount = 0; // every 5 seconds at first
 
-
-            var muncher;
-            var gridText;
+            var muncher, troggle = [];
+            var gridText = [];
             var score = 0, lives = 3, level = 1;
             var scoreText, scoreString, liveText, 
             liveString, levelString, levelText, multipleString, multipleText;
@@ -41,8 +41,12 @@
                     game.load.image("troggle", "assets/troggle.svg");
                     
                     game.stage.backgroundColor = "#000"
+
+                    game.time.events.loop(Phaser.Timer.SECOND * 2, spawn, this);
                 }
                 function create () {
+
+
                     // sprites
                     muncher = game.add.sprite( 0, 0, "muncher");
                     muncher.gridX = 2;
@@ -51,7 +55,6 @@
 
                     muncher.scale.setTo(0.5, 0.5); // set scale, go!
                     
-                    gridText = [];
 
                     for(var x = 0; x < grid.length; ++x)
                     {
@@ -70,7 +73,7 @@
                         }
 
                     }
-
+                   
 
                     // Text
                     scoreString = "Score: ";
@@ -94,7 +97,7 @@
                     
                     game.input.keyboard.onUpCallback = function(e)
                     {    
-                        if(game.paused) return; // paused games go no further.
+                        if(game.paused) return; // paused game, go no further.
 
 
                         var yy = muncher.gridY;
@@ -104,7 +107,7 @@
                         gridText[xx][yy].x -= 1000;
                                
                          
-                        if(e.key === "ArrowUp"){
+                        if(e.key === "ArrowUp"){ 
                             placeOnGridAt(muncher, xx, --yy);
                         }
                         else if(e.key === "ArrowDown"){
@@ -149,7 +152,7 @@
 
                             }
 
-                           
+                            munchers.grid.debug();
                         }
                     
                         // hacky hiding of the text the muncher is on. 
@@ -159,11 +162,33 @@
                   
                 }
 
+                function spawn()
+                {
+                    
+                    moveTroggles(troggle);
+
+                    troggleRateCount += .5;
+                    console.log(troggle);
+                    if(troggleRateCount >= troggleRate)
+                    {
+                        console.log("TROGGLE SPAWNED"); // spawn a troggle.
+                        troggle.push(game.add.sprite(0, 0, "troggle"));
+                        var pos = troggle.length - 1;
+                        troggle[pos].scale.setTo(0.5, 0.5);
+                        var coord = munchers.grid.generateMonster();
+                        troggle[pos].gridX = coord[0];
+                        troggle[pos].gridY = coord[1];
+                        gridText[troggle[pos].gridX][troggle[pos].gridY].x += 1000
+                        placeOnGridAt(troggle[pos], troggle[pos].gridX, troggle[pos].gridY);
+                        troggleRateCount = 0;
+                    }
+                }
+
                 function levelUp(){
 
                     ++level;                   
-                    lives = 3;
-                  
+                    if(score % 5000 == 0 && lives < 3) lives += 1;
+                    if(troggleRate > 2.5) troggleRate -= .5;       // more frequent troggles 
 
                     // new game stuff.
                     munchers.grid.generateMultiple();
@@ -199,6 +224,40 @@
 
 
                     game.paused = false;
+                }
+
+                function moveTroggles(troggles) {
+                    ///       0
+                    ///     1   2     
+                    ///       3
+
+                    for(var i = 0; i < troggles.length; ++i)
+                    {
+                        var choice = parseInt(Math.random() * 4);
+                       
+                        gridText[troggles[i].gridX][troggles[i].gridY].x -= 1000; // vanish it
+                        
+                        
+                        if(choice === 0 && troggles[i].gridY > 0)               // 0 up
+                           --troggles[i].gridY;
+                        else if(choice === 1 && troggles[i].gridX > 0)       // 1 right
+                           --troggles[i].gridX;
+                        else if(choice === 2 && troggles[i].gridX < 5)      // 2  left
+                           ++troggles[i].gridX;
+                        else if(choice == 3 && troggles[i].gridY < 4)      // 3 down
+                           ++troggles[i].gridY;
+                        else                                    // kill the troggle.
+                        {   
+                            troggles[i].destroy();
+                            troggles.splice(i, 1);
+                            return; // go no further
+                        }
+
+                        gridText[troggles[i].gridX][troggles[i].gridY].x += 1000;
+                        placeOnGridAt(troggles[i], troggles[i].gridX, troggles[i].gridY);
+                    }
+
+
                 }
 
                 function placeOnGridAt(item, x, y)

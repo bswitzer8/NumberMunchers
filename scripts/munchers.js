@@ -211,7 +211,7 @@ munchers.createGrid = function () {
         // if an object isn't already in place, then place a monster.
         if(typeof _grid[w][h] !== "object")
         {
-          _grid[w][h] = munchers.createMonster();
+          return [w, h];
         }        
     },
 
