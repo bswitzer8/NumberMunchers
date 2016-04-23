@@ -87,7 +87,7 @@ munchers.createPlayer = function(){ return { name: "player" } };
  *  The grid's dimensions are set using the GRID_HEIGHT and GRID_WIDTH
  *  variables. 
  *  
- *  -- generateMonster() - places a monster on the perimeter of the grid.
+ *  -- spawnMonster() - places a monster on the perimeter of the grid.
  *  this will be placed at random (if the (player/a troggle) isn't already
  *  occupying the square).
  *
@@ -121,14 +121,13 @@ munchers.createGrid = function () {
   var _number; 
   
  return {
-    // This function is used to generate a monster onto the board
     // from a corner of the board.
     blank: function (x, y) {
       if(x > GRID_WIDTH || y > GRID_HEIGHT || x < 0 || y < 0) return;
-      _grid[x][y] = "";
+      _grid[x][y].value = "";
     },
-    generateMonster: function () {
-        // position to generate troggle
+    spawnMonster: function () {
+        // position to spawn troggle
         var h = 0, w = 0;
         
 
@@ -158,7 +157,7 @@ munchers.createGrid = function () {
         }
 
         // if an object isn't already in place, then place a monster.
-        if(typeof _grid[w][h] !== "object")
+        if(typeof _grid[w][h].value !== "object")
         {
           return [w, h];
         }        
@@ -175,30 +174,39 @@ munchers.createGrid = function () {
     },
 
     // fills the board with numbers, and produces multiples of said numbers. 
-    fill: function () {
-        for(var w = 0; w < GRID_WIDTH; ++w)
+    fill: function (game) {
+
+        for(var x = 0; x < GRID_WIDTH; ++x)
         {
-          _grid[w] = [];
-          for(var h = 0; h < GRID_HEIGHT; ++h){
+            _grid[x] = [];
+            for(var y = 0; y < GRID_HEIGHT; ++y)
+            { 
 
-            // assign a random number to c.
-            var c = parseInt(Math.random() * 5);
-           
-            // take the number and apply a multipler. 
-            var multiplied = _number * parseInt((1 + (Math.random() * 5)));
-            
-            // so if the value of c is 3, then we will 
-            // a) assign the grid position to the multiplied number, or
-            // b) take the multipled number and add a random number to it. 
-            _grid[w][h] = parseInt( c % 3 == 0 ? 
-              multiplied            
-              : (multiplied + ((Math.random() + 1) * 11 ) )
-              );  
+                _grid[x].push(game.add.text(50 +(x * 100), 50 + (y * 80), "", { font: "50px Times New Roman", fill: "#888888"  }))
+                
+                var c = parseInt(Math.random() * 5);
+                var multiplied = _number * parseInt((1 + (Math.random() * 5)));
 
-          } // end of height for loop.
-        } // end of width for loop.
+                 // so if the value of c is 3, then we will 
+                // a) assign the grid position to the multiplied number, or
+                // b) take the multipled number and add a random number to it. 
+                _grid[x][y].value =  parseInt( c % 3 == 0 ? 
+                    multiplied            
+                    : (multiplied + ((Math.random() + 1) * 11 ) )
+                    );
+                  
+                _grid[x][y].text = _grid[x][y].value;                
+                
+                _grid[x][y].setVisable = true;
+                
+            }
 
-        _grid[2][2] = munchers.createPlayer();
+        }
+
+        _grid[2][2].value = munchers.createPlayer();
+        _grid[2][2].visible = false;
+
+        return _grid;
     },
 
     // return the number we are looking for multiples of.
@@ -212,7 +220,8 @@ munchers.createGrid = function () {
       {
         for(var h = 0; h < GRID_HEIGHT; ++h)
         {
-          _grid[w][h] = '';
+          _grid[w][h].destroy();
+          _grid[w][h].value = '';
         }
       }
     },
@@ -222,7 +231,7 @@ munchers.createGrid = function () {
       {
         for(var h = 0; h < GRID_HEIGHT; ++h)
         {
-          if (_grid[w][h] != "" && _grid[w][h] % _number === 0)
+          if (_grid[w][h].value != "" && _grid[w][h].value % _number === 0)
           {
             return false; 
           }
@@ -246,13 +255,13 @@ munchers.createGrid = function () {
         var g = "";
         for(var w = 0; w < GRID_WIDTH; ++w)
         {
-          if(typeof _grid[w][h] !== "object")
+          if(typeof _grid[w][h].value !== "object")
           {
-            g += _grid[w][h] + (_grid[w][h] < 10 ? "    " : "   ");
+            g += _grid[w][h].value + (_grid[w][h].value < 10 ? "    " : "   ");
           }
           else 
           {
-            if(_grid[w][h].name == undefined)
+            if(_grid[w][h].value.name == undefined)
               g += "T    ";
             else
               g += "M    ";
@@ -486,6 +495,7 @@ munchers.leaderBoard = munchers.createLeaderBoard();
                 else {
                     // Assign user data to userData variable with munchers.js scope
                     userData = authData;
+
                 } // end else
             },{
                 remember: "sessionOnly"
@@ -574,18 +584,290 @@ munchers.phaserFunctions = function(){
         // Purpose: Load new phaser.io Game to "phaser-canvas" html block
         // Function Call: munchers.phaser.loadPhaser();
         loadPhaser: function(){
+     
+
+            var troggleRate = 2.5, troggleRateCount = 0; // every 5 seconds at first
+            var gridObject;
+            var muncher, troggle = [];
+            var multipleOf;
+            var score = 0, lives = 3, level = 1;
+            var scoreText, scoreString, liveText, 
+            liveString, levelString, levelText, multipleString, multipleText;
+            var overlay;
+
             // I want to play a game. </saw>
             game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
 
-            function preload () {                
+        
 
+            function preload () {                
+              game.load.image("muncher", "assets/muncher.svg");
+              game.load.image("troggle", "assets/troggle.svg");
+              game.load.image("overlay1", "assets/eatenoverlay.png");
+
+              game.stage.backgroundColor = "#000"
+              game.time.events.loop(Phaser.Timer.SECOND * 2, progress, this);
             }
             function create () {
+              munchers.grid.generateMultiple();
+              gridObject = munchers.grid.fill(game);
+              // var grid = munchers.grid.grid();
+            
+              multipleOf = munchers.grid.number();
 
+              muncher = game.add.sprite( 0, 0, "muncher");
+              muncher.gridX = 2;
+              muncher.gridY = 2;
+              placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+
+              muncher.scale.setTo(0.5, 0.5); // set scale, go!
+                            
+             
+
+              // Text
+              scoreString = "Score: ";
+              scoreText = game.add.text(10, game.world.height - 40, scoreString + score, { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"});
+              scoreText.setVisable = true;
+
+              liveString = "Lives: ";
+              liveText = game.add.text(game.world.centerX + 100, game.world.height - 40, liveString + lives, { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"});
+              liveText.setVisable = true;
+
+              levelString = "Level: "
+              levelText = game.add.text(10, 10, levelString + "1", { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"  });
+              levelText.setVisable = true;
+
+              multipleString = "Multiples of ";
+              multipleText = game.add.text(game.world.centerX - 70, 10, multipleString + multipleOf,  { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"  });
+
+              // we need to add this last.
+              overlay = game.add.sprite(160, game.world.centerY - 40, "overlay1");
+              overlay.visible = false;
             }
-            function update() {
 
-            } 
+            function update() {
+               game.input.keyboard.onUpCallback = function(e)
+               {    
+                  if(e.key === "Enter" && game.paused && lives > 0)
+                  {
+                      overlay.visible = false;
+                      game.paused = false;
+                  }
+
+                  if(game.paused) return; // paused game, go no further.
+
+
+                  var yy = muncher.gridY;
+                  var xx = muncher.gridX;
+
+                  gridObject[xx][yy].visible = true;
+                   
+                  if(e.key === "ArrowUp"){ 
+                      placeOnGridAt(muncher, xx, --yy);
+                  }
+                  else if(e.key === "ArrowDown"){
+                      placeOnGridAt(muncher, xx, ++yy);
+                  }                        
+                  else if(e.key === "ArrowLeft"){
+                      placeOnGridAt(muncher, --xx, yy);
+                  }
+                  else if(e.key === "ArrowRight"){
+                      placeOnGridAt(muncher, ++xx, yy);
+                  }
+                  if(e.key === " ") // space!
+                  {
+                      if(gridObject[xx][yy].text != "" && gridObject[xx][yy].value % multipleOf === 0)
+                      {   
+                         
+                          score += 20 + ((level - 1) * 10); // scale that score with the level.
+                          scoreText.text = scoreString + score; 
+                      
+                          gridObject[xx][yy].text = "";    
+                         
+                          munchers.grid.blank(xx, yy);
+                          if(munchers.grid.winCheck())
+                          {
+                              game.paused = true;
+                              levelUp();
+                              return;
+                          }
+                      }
+                      else
+                      {
+                          --lives;
+                          liveText.text = liveString + lives; 
+                          gridObject[xx][yy].text = ""; 
+                          munchers.grid.blank(xx, yy);
+                          if(lives == 0)
+                          {
+                              game.paused = true;
+                              gameOver();
+                              return;
+                          }
+
+                      }
+                  }
+                  
+                  for(var i = 0; i < troggle.length; ++i)
+                  {
+                      if(troggle[i].gridX == muncher.gridX && troggle[i].gridY == muncher.gridY)
+                      {
+                          collide();
+                          return;
+                      }
+                  }
+
+
+                  gridObject[muncher.gridX][muncher.gridY].visible = false; 
+              }
+
+            } // end of update
+
+            function progress()
+                {
+                    // update 
+                    moveTroggles(troggle);
+                    spawn();
+                }
+
+                function spawn()
+                {
+                    troggleRateCount += .5;
+                    if(troggleRateCount >= troggleRate)
+                    {
+                        // add a new troggle.
+                        troggle.push(game.add.sprite(0, 0, "troggle"));
+                        // get position of most recent addition.
+                        var pos = troggle.length - 1;
+                        // scale that image to half size
+                        troggle[pos].scale.setTo(0.5, 0.5);
+                        // generate a coordinate for it.
+                        var coord = munchers.grid.spawnMonster();
+                        troggle[pos].gridX = coord[0];
+                        troggle[pos].gridY = coord[1];
+                        // make it invisible.
+                        gridObject[troggle[pos].gridX][troggle[pos].gridY].visible = false;
+                        placeOnGridAt(troggle[pos], troggle[pos].gridX, troggle[pos].gridY);
+                        troggleRateCount = 0; // reset the count
+                    }
+                }
+
+                function collide() {
+                    
+                    overlay.visible = true;
+                    game.paused = true;
+                    for(var i = 0; i < troggle.length; ++i)
+                    {
+                        troggle[i].destroy();
+                        troggle.splice(i, 1);
+                    }
+
+                    --lives;
+                    if(lives == 0)
+                    {
+                        gameOver();
+                        return;
+                    }
+
+                    liveText.text = liveString + lives;
+
+                    muncher.gridX = 2;
+                    muncher.gridY = 2;
+                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+                }
+
+                function levelUp(){
+
+                    ++level;                   
+                    if(score % 5000 == 0 && lives < 3) lives += 1; // reward lives? (improve)
+                    if(troggleRate > 2.5) troggleRate -= .5;       // more frequent troggles 
+
+                    // new game stuff.
+                    munchers.grid.generateMultiple();
+                    
+                    munchers.grid.reset();
+                    gridObject = munchers.grid.fill(game);
+          
+                    multipleOf = munchers.grid.number();
+
+                    levelText.text = levelString + level;
+                    multipleText.text = multipleString + multipleOf;
+                    liveText.text = liveString + lives;
+
+
+                    muncher.gridX = 2;
+                    muncher.gridY = 2;
+                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+
+
+                    game.paused = false;
+                }
+
+                function moveTroggles(troggles) {
+                    ///       0
+                    ///     1   2     
+                    ///       3
+
+                    for(var i = 0; i < troggles.length; ++i)
+                    {
+                        var choice = parseInt(Math.random() * 4);
+                       
+                        gridObject[troggles[i].gridX][troggles[i].gridY].visible = true; // vanish it
+                        
+                        
+                        if(choice === 0 && troggles[i].gridY > 0)               // 0 up
+                           --troggles[i].gridY;
+                        else if(choice === 1 && troggles[i].gridX > 0)       // 1 right
+                           --troggles[i].gridX;
+                        else if(choice === 2 && troggles[i].gridX < 5)      // 2  left
+                           ++troggles[i].gridX;
+                        else if(choice == 3 && troggles[i].gridY < 4)      // 3 down
+                           ++troggles[i].gridY;
+                        else                                    // kill the troggle.
+                        {   
+                            troggles[i].destroy();
+                            troggles.splice(i, 1);
+                            return; // go no further
+                        }
+
+                        if(troggles[i].gridX == muncher.gridX && troggles[i].gridY == muncher.gridY)
+                        {
+                            collide();
+                            return;
+                        }
+
+                        gridObject[troggles[i].gridX][troggles[i].gridY].visible = false;
+                        placeOnGridAt(troggles[i], troggles[i].gridX, troggles[i].gridY);
+                    }
+
+
+                }
+
+                function placeOnGridAt(item, x, y)
+                {
+                  
+                    if(x < 6 && x >= 0)
+                    {
+                        item.x = (x * 100) + 50;
+                        item.gridX = x;
+                    } 
+        
+                    if(y < 5 && y >= 0)
+                    {
+                        item.y = (y * 80) + 50;
+                        item.gridY = y;
+                    }
+                       
+                }
+
+                function gameOver() {
+                    
+                    // Display End game overlay
+
+                    // Submit to the leader board
+
+                    // prompt to play a game?
+                } 
         }
     };
 }

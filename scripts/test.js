@@ -219,7 +219,7 @@ munchersTest.gridTests.shouldFillGridWithNumbers = function () {
   // test for any blanks in the grid.
   for(var i = 0; i < 5; ++i) {
     for(var j = 0; j < 6; ++j) {
-      if( (isNaN(g[i][j]) && (typeof g[i][j] != "object"))) {
+      if( (isNaN(g[i][j].value) && (typeof g[i][j].value != "object"))) {
         blank = true;
         break;
       }
@@ -231,7 +231,7 @@ munchersTest.gridTests.shouldFillGridWithNumbers = function () {
 
 munchersTest.gridTests.shouldInitializePlayer = function () {
   var g = munchersTest.gridTests.grid.grid();
-  return g[2][2].name === "player";
+  return g[2][2].value.name === "player";
 }
 
 munchersTest.gridTests.shouldProduceADivisibleNumber = function () {
@@ -241,7 +241,7 @@ munchersTest.gridTests.shouldProduceADivisibleNumber = function () {
     
   for(var i = 0; i < 5; ++i) {
     for(var j = 0; j < 6; ++j) {
-      if( g[i][j] % num == 0) {
+      if( g[i][j].value % num == 0) {
         divible = true;
         break;
       }
@@ -256,7 +256,7 @@ munchersTest.gridTests.shouldProduceARandomTroggle = function () {
   var t = 0; // if t is 1 at the end of this, then createMonster was called.
 
   munchers.createMonster = function() { ++t; return {} };  // create a spy
-  munchersTest.gridTests.grid.generateMonster();
+  munchersTest.gridTests.grid.spawnMonster();
   
   return t > 0;
 }
@@ -268,7 +268,7 @@ munchersTest.gridTests.shouldClearTheGrid = function () {
   // test to make sure everything is ''
   for(var i = 0; i < 5; ++i) {
     for(var j = 0; j < 6; ++j) {
-      if(g[i][j] != '') {
+      if(g[i][j].value != '') {
         blank = false;
       }
     }
@@ -412,7 +412,7 @@ munchersTest.RunTests = function () {
   );
   
   munchersTest.logResult(
-    'Grid.generateMonster() produces a random troggle on the grid',
+    'Grid.spawnMonster() produces a random troggle on the grid',
     munchersTest.gridTests.shouldProduceARandomTroggle()
   );
   
