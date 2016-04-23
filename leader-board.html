@@ -9,9 +9,23 @@
         <script src="scripts/firebase.js"></script>
         <script src="scripts/munchers.js"></script>
         <script>
-            window.onload = function() {
-                munchers.leaderBoard.print();
-            };
+            addOnLoad(function(){window.setTimeout(munchers.leaderBoard.print, 500);});
+            function addOnLoad(newFunction){
+                var oldOnLoad = window.onload;
+
+                if(typeof oldOnLoad == "function"){
+                    window.onload = function(){
+                        if(oldOnLoad){
+                            oldOnLoad();
+                        }
+                        newFunction();
+                    }
+                }
+                else{
+                    window.onload = newFunction;
+                }
+            }
+            
         </script>
     </head> 
     <body>
@@ -87,7 +101,7 @@
                     <tr>
                         <td id="row-8__player"></td>
                         <td id="row-8__school"></td>
-                        <td id="row-8__score" ></td>.
+                        <td id="row-8__score" ></td>
                         <td id="row-8__date"  ></td>
                     </tr>
 

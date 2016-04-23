@@ -361,16 +361,20 @@ munchers.createLeaderBoard = function () {
     // Purpose: 
     // Function Call: munchers.leaderBoard.print()
     print: function () {
-         var leaderBoard = munchers.fire.getScores();
-         var leaderBoardLength = leaderBoard.length; 
-         for (var i=0; i < leaderBoardLength; i++){
-            document.getElementById(tableRows[i][0]).innerHTML = leaderBoard[i].playerName;
-            document.getElementById(tableRows[i][1]).innerHTML = leaderBoard[i].schoolName;
-            document.getElementById(tableRows[i][2]).innerHTML = leaderBoard[i].score;
-            document.getElementById(tableRows[i][3]).innerHTML = leaderBoard[i].date.Month + "/" + leaderBoard[i].date.Day + "/" + leaderBoard[i].date.Year;
+        console.log("Starting getScores()");
+         var leaderBoardArray = munchers.fire.getScores();
+            console.log("getScores() completed");
+         var leaderBoardLength = leaderBoardArray.length; 
+            console.log("leaderBoardLength: ", leaderBoardLength);
+         for (var i=0; i < leaderBoardLength; ++i){
+            document.getElementById(tableRows[i][0]).innerHTML = leaderBoardArray[i].playerName;
+            document.getElementById(tableRows[i][1]).innerHTML = leaderBoardArray[i].schoolName;
+            document.getElementById(tableRows[i][2]).innerHTML = leaderBoardArray[i].score;
+            document.getElementById(tableRows[i][3]).innerHTML = leaderBoardArray[i].date.Month + "/" + leaderBoardArray[i].date.Day + "/" + leaderBoardArray[i].date.Year;
          }
+            console.log("End of print()");
          return true;
-    },
+    }
   };  // end of created leaderboard object
 }  
 munchers.leaderBoard = munchers.createLeaderBoard();
@@ -488,48 +492,13 @@ munchers.leaderBoard = munchers.createLeaderBoard();
             myDatabase.once("value", function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
                     localCopy.unshift(childSnapshot.val());
+                    //console.log("Logout successful:", userData.facebook.displayName);
                 });  
             });
             
             return localCopy;
-        },
+        }
     }; // end definition of fireFunctions object
 } 
  munchers.fire = munchers.fireFunctions();
-
-
-
-munchers.testFunctions = function(){
-    return {
-        // Function Call: munchers.testIT.submitRandomScore()
-        submitRandomScore: function (){
-            munchers.leaderBoard.submitScore(Math.floor((Math.random() * 100) + 1), 'score');
-        },
-        
-        // Function Call: munchers.testIT.printLeaderboard()
-        printLeaderboard: function() {
-            //munchers.leaderBoard.clear();
-            munchers.leaderBoard.submitScore(22, 'score');
-            munchers.leaderBoard.submitScore(1,  'score');
-            munchers.leaderBoard.submitScore(333,  'score');
-            return munchers.leaderBoard.print();
-        },
-        // Function Call: munchers.testIT.shouldEnforceMaxNumOfScores()
-        shouldEnforceMaxNumOfScores: function () {
-            var numScoresSubmitted = 0;
-            var numScoresStored;
-
-            munchers.leaderBoard.clear();
-
-            for (var i = 0; i < 13; ++i) {
-                munchers.leaderBoard.submitScore(i);
-            }
-        },
-        getEntryCountTest: function() {
-            console.log("All Time Entry Count: ", munchers.fire.getEntryCount());
-            console.log("All Time Low Score: ", munchers.fire.getLowScore().score);
-        }
-    };
-} 
-munchers.testIT = munchers.testFunctions();
 
