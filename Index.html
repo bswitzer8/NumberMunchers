@@ -23,7 +23,7 @@
             var score = 0, lives = 3, level = 1;
             var scoreText, scoreString, liveText, 
             liveString, levelString, levelText, multipleString, multipleText;
-
+            var overlay;
 
             // phaser stuff will be here
             window.onload = function() {
@@ -34,14 +34,16 @@
                 function preload () {                
                     game.load.image("muncher", "assets/muncher.svg");
                     game.load.image("troggle", "assets/troggle.svg");
-                    
+                    game.load.image("overlay1", "assets/eatenoverlay.png");
+
                     game.stage.backgroundColor = "#000"
 
                     game.time.events.loop(Phaser.Timer.SECOND * 2, spawn, this);
                 }
                 function create () {
 
-                    // sprites
+
+
                     muncher = game.add.sprite( 0, 0, "muncher");
                     muncher.gridX = 2;
                     muncher.gridY = 2;
@@ -85,12 +87,20 @@
                     multipleString = "Multiples of ";
                     multipleText = game.add.text(game.world.centerX - 70, 10, multipleString + multipleOf,  { font: "30px 'Press Start 2P'", fill: "rgb(46, 219, 46)"  });
 
+                      // sprites
+                    overlay = game.add.sprite(160, game.world.centerY - 40, "overlay1");
+                    overlay.visible = false;
                 }
 
                 function update() {
                     
                     game.input.keyboard.onUpCallback = function(e)
                     {    
+                        if(e.key === "Enter" && game.paused && lives > 0)
+                        {
+                            overlay.visible = false;
+                            game.paused = false;
+                        }
                         if(game.paused) return; // paused game, go no further.
 
 
@@ -98,7 +108,7 @@
                         var xx = muncher.gridX;
 
                         // hacky: bringing back the text back from the abyss.
-                        gridText[xx][yy].x -= 1000;
+                        gridText[xx][yy].visible = true;
                                
                          
                         if(e.key === "ArrowUp"){ 
@@ -148,9 +158,19 @@
 
                             munchers.grid.debug();
                         }
-                    
-                        // hacky hiding of the text the muncher is on. 
-                        gridText[muncher.gridX][muncher.gridY].x += 1000;  
+                        
+                        for(var i = 0; i < troggle.length; ++i)
+                        {
+                            if(troggle[i].gridX == muncher.gridX && troggle[i].gridY == muncher.gridY)
+                            {
+                                console.log("NEGATIVE LIVES FOR THE MUNCHER");
+                                collide();
+                                return;
+                            }
+                        }
+
+
+                        gridText[muncher.gridX][muncher.gridY].visible = false; 
                     }
 
                   
@@ -172,10 +192,37 @@
                         var coord = munchers.grid.generateMonster();
                         troggle[pos].gridX = coord[0];
                         troggle[pos].gridY = coord[1];
-                        gridText[troggle[pos].gridX][troggle[pos].gridY].x += 1000
+                        gridText[troggle[pos].gridX][troggle[pos].gridY].visible = true;
                         placeOnGridAt(troggle[pos], troggle[pos].gridX, troggle[pos].gridY);
                         troggleRateCount = 0;
                     }
+                }
+
+                function collide() {
+                    
+                    overlay.visible = true;
+                    game.paused = true;
+                    for(var i = 0; i < troggle.length; ++i)
+                    {
+                        troggle[i].destroy();
+                        troggle.splice(i, 1);
+                    }
+
+                    --lives;
+                    if(lives == 0)
+                    {
+                        gameOver();
+                        return;
+                    }
+
+                    liveText.text = liveString + lives;
+
+                    muncher.gridX = 2;
+                    muncher.gridY = 2;
+                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
+
+                   
+
                 }
 
                 function levelUp(){
@@ -207,7 +254,7 @@
                             else {
                                 gridText[x][y].text = grid[x][y];
                                 
-                                gridText[x][y].setVisable = true;
+                                gridText[x][y].visible = true;
                             }
                         }
                     }
@@ -229,7 +276,7 @@
                     {
                         var choice = parseInt(Math.random() * 4);
                        
-                        gridText[troggles[i].gridX][troggles[i].gridY].x -= 1000; // vanish it
+                        gridText[troggles[i].gridX][troggles[i].gridY].visible = true; // vanish it
                         
                         
                         if(choice === 0 && troggles[i].gridY > 0)               // 0 up
@@ -247,7 +294,13 @@
                             return; // go no further
                         }
 
-                        gridText[troggles[i].gridX][troggles[i].gridY].x += 1000;
+                        if(troggles[i].gridX == muncher.gridX && troggles[i].gridY == muncher.gridY)
+                        {
+                            console.log("NEGATIVE LIVES FOR THE MUNCHER");
+                            collide();
+                        }
+
+                        gridText[troggles[i].gridX][troggles[i].gridY].visible = false;
                         placeOnGridAt(troggles[i], troggles[i].gridX, troggles[i].gridY);
                     }
 
@@ -272,6 +325,7 @@
                 }
 
                 function gameOver() {
+                    console.log("It's all over now");
                     // Display End game overlay
 
                     // Submit to the leader board
@@ -298,6 +352,9 @@
                 <li><a id="links__game"         href="#" onclick="munchers.phaser.newGame()">New Game</a></li>
                 <li><a id="links__leader-board" href="leader-board.html"                    >View Leader Board</a></li>
             </ul>
+
+            <br>
+           
         </nav>
 
         <main id="phaser-canvas"></main>
