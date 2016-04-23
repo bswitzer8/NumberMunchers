@@ -7,6 +7,8 @@ var myDatabase = new Firebase("https://fsu-number-munchers.firebaseio.com");
 var munchers = {};
 // userData stores the auth object which is returned by FaceBook authenication. 
 var userData;
+// Local Game variable. Used to load the phaser.io gameboard and also to test for existing game.
+var game;
 // Local Leaderboard Json
 var leaderBoardJSON;
 myDatabase.orderByChild("score").on("child_added", function(snapshot) {
@@ -420,8 +422,29 @@ munchers.leaderBoard = munchers.createLeaderBoard();
  munchers.fireFunctions = function(){
     var tempScore = {};
     var tempCount1;
-    var tempCount2; 
+    var tempCount2;
     return {
+        // Purpose: Set up console feedback for user authentication and deauthentication
+        // Function Call: munchers.fire.setAuth()
+        setAuth: function(){
+            myDatabase.onAuth(function(authData) {
+                if (authData) {
+                    console.log("Client Authenticated:", authData.facebook.displayName);
+                    document.getElementById("phaser-canvas").style.color= "#000000";
+                    document.getElementById("phaser-canvas").innerHTML = "";
+                    document.getElementById("links__logout").style.display= "initial";
+                    document.getElementById("links__logout").innerHTML = "Log Out (" + authData.facebook.displayName + ")";
+                    document.getElementById("links__login").style.display= "none";
+                } else {
+                    console.log("Client Deauthenticated.");
+                    document.getElementById("phaser-canvas").style.color= "#888888";
+                    document.getElementById("phaser-canvas").innerHTML = "Welcome to Return of the Number Munchers!";
+                    document.getElementById("links__login").style.display= "initial";
+                    document.getElementById("links__logout").style.display= "none";
+                }
+            });
+        },
+        
         // Purpose: log the user into application using Firebase Facebook authentication.
         // Function Call: munchers.fire.login()
         login: function(){
@@ -432,25 +455,17 @@ munchers.leaderBoard = munchers.createLeaderBoard();
                 else {
                     // Assign user data to userData variable with munchers.js scope
                     userData = authData;
-                    console.log("Authentication Successful:", userData.facebook.displayName);
                 } // end else
             },{
                 remember: "sessionOnly"
             }); // end myDatabase.authWithOAuthPopup
-            
-           document.getElementById("logout-link").style.display= "initial";
-           document.getElementById("login-link").style.display= "none";
         }, // end login()
         
         // Purpose: log the user out and print to console for verification.
         // Function Call: munchers.fire.logout()
         logout: function(){
-            myDatabase.unauth() 
-            {
-                console.log("Logout successful:", userData.facebook.displayName);
-            }; 
-            document.getElementById("logout-link").style.display= "none";
-            document.getElementById("login-link").style.display= "initial";
+            myDatabase.unauth();
+
         }, // end logout()
         
         // Purpose: Get lowest score (object) from All_Time_Leaderboard
@@ -500,5 +515,47 @@ munchers.leaderBoard = munchers.createLeaderBoard();
         }
     }; // end definition of fireFunctions object
 } 
- munchers.fire = munchers.fireFunctions();
+munchers.fire = munchers.fireFunctions();
 
+munchers.phaserFunctions = function(){
+    var confirmed;
+    return {
+        // Purpose:
+        // Function Call: munchers.phaser.newGame();
+        newGame: function(){
+            var authTest = myDatabase.getAuth();
+            if (authTest){
+                if (game){
+                    confirmed = confirm("Do you want to exit the existing game?");
+                    if (confirmed){
+                        document.getElementById("phaser-canvas").innerHTML = "";
+                        munchers.phaser.loadPhaser();
+                    } 
+                } else {
+                    document.getElementById("phaser-canvas").innerHTML = "";
+                    munchers.phaser.loadPhaser();
+                }
+                
+            } else {
+                alert ("You must be logged in to play!");
+            }
+        },
+        // Purpose:
+        // Function Call: munchers.phaser.loadPhaser();
+        loadPhaser: function(){
+            // I want to play a game. </saw>
+            game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
+
+            function preload () {                
+
+            }
+            function create () {
+
+            }
+            function update() {
+
+            } 
+        }
+    };
+}
+munchers.phaser = munchers.phaserFunctions();

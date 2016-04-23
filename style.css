@@ -8,17 +8,18 @@ html, body {
 }
 
 body {
-    background-color: #000000;
+    background-color: #FFFFFF;
     color: #888888;
     font-family: 'Press Start 2P', cursive;    
 }
 
 main {
-    float:right;
+    float: right;
     width: 75%;
     display: flex;
     justify-content: center;
     align-items: center;
+    color: #000000
 }
 
 footer {

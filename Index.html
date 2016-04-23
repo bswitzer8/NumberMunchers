@@ -23,29 +23,22 @@
 
             // phaser stuff will be here
             window.onload = function() {
-                // I want to play a game. </saw>
-                var game = new Phaser.Game(800, 500, Phaser.AUTO, 'phaser-canvas', { preload: preload, create: create, update: update });
-
-                function preload () {                
-
-                }
-                function create () {
-
-                }
-                function update() {
-                    
-                }
+                // Initiate authentication features
+                munchers.fire.setAuth();
+                // Load Phaser.io Game
+                munchers.phaser.newGame();
             };
+
    		</script>
 	</head>
     <body>
         <nav>
             <h1>Return of the Number Munchers</h1>
             <ul>
-                <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
-                <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()">Log Out</a></li>
-                <li><a id="links__game"         href="Index.html"       >New Game</a></li>
-                <li><a id="links__leader-board" href="leader-board.html">View Leader Board</a></li>
+                <li><a id="links__login"        href="#" onclick="munchers.fire.login()"    >Log In</a></li>
+                <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()"   ></a></li>
+                <li><a id="links__game"         href="#" onclick="munchers.phaser.newGame()">New Game</a></li>
+                <li><a id="links__leader-board" href="leader-board.html"                    >View Leader Board</a></li>
             </ul>
         </nav>
         <main id="phaser-canvas"></main>

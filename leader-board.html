@@ -9,6 +9,7 @@
         <script src="scripts/firebase.js"></script>
         <script src="scripts/munchers.js"></script>
         <script>
+            addOnLoad(function(){munchers.fire.setAuth();});
             addOnLoad(function(){window.setTimeout(munchers.leaderBoard.print, 500);});
             function addOnLoad(newFunction){
                 var oldOnLoad = window.onload;
@@ -33,9 +34,9 @@
             <h1>Return of the Number Munchers</h1>
                 <ul>
                     <li><a id="links__login"        href="#" onclick="munchers.fire.login()" >Log In</a></li>
-                    <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()">Log Out</a></li>
-                    <li><a id="links__game"         href="Index.html"       >New Game</a></li>
-                    <li><a id="links__leader-board" href="leader-board.html">View Leader Board</a></li>
+                    <li><a id="links__logout"       href="#" onclick="munchers.fire.logout()"></a></li>
+                    <li><a id="links__game"         href="Index.html"                        >Return to Main Screen</a></li>
+                    <li><a id="links__leader-board" href="leader-board.html"                 >Refresh Leader Board</a></li>
                 </ul>
         </nav>
         <main id="leader-board">  
