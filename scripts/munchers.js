@@ -319,7 +319,8 @@ munchers.createLeaderBoard = function () {
      * returns boolean: True means the score was added to the board, false
      *                  means it was not.
      */
-    submitScore: function (_score, _schoolName) { 
+    // Function Call: munchers.leaderBoard.submitScore(_score);
+    submitScore: function (_score) { 
       var userData = myDatabase.getAuth();
       var _playerName;
       
@@ -360,7 +361,6 @@ munchers.createLeaderBoard = function () {
           schoolName: _schoolName,
           date:       _date
         };  
-        
         // Check if All_Time_Leaderboard is full
         if (munchers.fire.getEntryCount() < MAX_NUM_HIGH_SCORES){
             myDatabase.push(newHighScore).setPriority(newHighScore.score);
@@ -374,13 +374,13 @@ munchers.createLeaderBoard = function () {
         return true;
       }  // end of if (score == null || score == undefined)
     },  // end of submitScore()
-
-    // Clear all leaderboards - primarily for testing purposes.
+    // Purpose: Clear all leaderboards - primarily for testing purposes.
+    // Function Call: munchers.leaderBoard.clear();
     clear: function () {
         myDatabase.remove();
     },
-    // Purpose: 
-    // Function Call: munchers.leaderBoard.print()
+    // Purpose: Print the leaderboard array to the user screen.
+    // Function Call: munchers.leaderBoard.print();
     print: function () {
         console.log("Starting getScores()");
          var leaderBoardArray = munchers.fire.getScores();
@@ -539,7 +539,7 @@ munchers.fire = munchers.fireFunctions();
 munchers.phaserFunctions = function(){
     var confirmed;
     return {
-        // Purpose:
+        // Purpose: Check for authentication and existing game, then load new game if needed.
         // Function Call: munchers.phaser.newGame();
         newGame: function(){
             var authTest = myDatabase.getAuth();
@@ -559,7 +559,7 @@ munchers.phaserFunctions = function(){
                 alert ("You must be logged in to play!");
             }
         },
-        // Purpose:
+        // Purpose: Load new phaser.io Game to "phaser-canvas" html block
         // Function Call: munchers.phaser.loadPhaser();
         loadPhaser: function(){
             // I want to play a game. </saw>
