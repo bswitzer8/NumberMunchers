@@ -9,7 +9,7 @@
         <script src="scripts/firebase.js"></script>
         <script src="scripts/munchers.js"></script>
         <script>
-            addOnLoad(function(){munchers.fire.setAuth();});
+            addOnLoad(function(){window.setTimeout(munchers.fire.setAuth(), 500);});
             addOnLoad(function(){window.setTimeout(munchers.leaderBoard.print, 1000);});
             function addOnLoad(newFunction){
                 var oldOnLoad = window.onload;
