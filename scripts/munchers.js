@@ -446,20 +446,32 @@ munchers.leaderBoard = munchers.createLeaderBoard();
         // Purpose: Set up console feedback for user authentication and deauthentication
         // Function Call: munchers.fire.setAuth()
         setAuth: function(){
+            var canvasExists = document.getElementById("phaser-canvas");
+            var leaderBoardExists = document.getElementById("leader-board");
+            
             myDatabase.onAuth(function(authData) {
                 if (authData) {
                     console.log("Client Authenticated:", authData.facebook.displayName);
-                    document.getElementById("phaser-canvas").style.color= "#000000";
-                    document.getElementById("phaser-canvas").innerHTML = "";
                     document.getElementById("links__logout").style.display= "initial";
                     document.getElementById("links__logout").innerHTML = "Log Out (" + authData.facebook.displayName + ")";
                     document.getElementById("links__login").style.display= "none";
+                    
+                    if (canvasExists){
+                        document.getElementById("phaser-canvas").style.color= "#000000";
+                        document.getElementById("phaser-canvas").innerHTML = "";
+                    } else if (leaderBoardExists){
+                        
+                    }
                 } else {
                     console.log("Client Deauthenticated.");
-                    document.getElementById("phaser-canvas").style.color= "#888888";
-                    document.getElementById("phaser-canvas").innerHTML = "Welcome to Return of the Number Munchers!";
                     document.getElementById("links__login").style.display= "initial";
                     document.getElementById("links__logout").style.display= "none";
+                    if (canvasExists){
+                        document.getElementById("phaser-canvas").style.color= "#888888";
+                        document.getElementById("phaser-canvas").innerHTML = "Welcome to Return of the Number Munchers!";
+                    } else if (leaderBoardExists){
+                        
+                    }
                 }
             });
         },
