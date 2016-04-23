@@ -216,7 +216,7 @@ munchers.createGrid = function () {
 
     // Clears the grid.
     reset: function () {
-      for(var w = 0; w < GRID_WIDTH; ++w)
+       for(var w = 0; w < GRID_WIDTH; ++w)
       {
         for(var h = 0; h < GRID_HEIGHT; ++h)
         {
@@ -610,8 +610,8 @@ munchers.phaserFunctions = function(){
             }
             function create () {
               munchers.grid.generateMultiple();
+            
               gridObject = munchers.grid.fill(game);
-              // var grid = munchers.grid.grid();
             
               multipleOf = munchers.grid.number();
 
@@ -621,7 +621,6 @@ munchers.phaserFunctions = function(){
               placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
 
               muncher.scale.setTo(0.5, 0.5); // set scale, go!
-                            
              
 
               // Text
@@ -724,11 +723,13 @@ munchers.phaserFunctions = function(){
             } // end of update
 
             function progress()
-                {
-                    // update 
-                    moveTroggles(troggle);
-                    spawn();
-                }
+            {
+              // update 
+              moveTroggles(troggle);
+              spawn();
+
+            }
+
 
                 function spawn()
                 {
@@ -763,45 +764,15 @@ munchers.phaserFunctions = function(){
                     }
 
                     --lives;
+                    liveText.text = liveString + lives;
                     if(lives == 0)
                     {
                         gameOver();
                         return;
                     }
-
-                    liveText.text = liveString + lives;
-
-                    muncher.gridX = 2;
-                    muncher.gridY = 2;
-                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
                 }
 
-                function levelUp(){
-
-                    ++level;                   
-                    if(score % 5000 == 0 && lives < 3) lives += 1; // reward lives? (improve)
-                    if(troggleRate > 2.5) troggleRate -= .5;       // more frequent troggles 
-
-                    // new game stuff.
-                    munchers.grid.generateMultiple();
-                    
-                    munchers.grid.reset();
-                    gridObject = munchers.grid.fill(game);
-          
-                    multipleOf = munchers.grid.number();
-
-                    levelText.text = levelString + level;
-                    multipleText.text = multipleString + multipleOf;
-                    liveText.text = liveString + lives;
-
-
-                    muncher.gridX = 2;
-                    muncher.gridY = 2;
-                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
-
-
-                    game.paused = false;
-                }
+            
 
                 function moveTroggles(troggles) {
                     ///       0
@@ -839,8 +810,35 @@ munchers.phaserFunctions = function(){
                         gridObject[troggles[i].gridX][troggles[i].gridY].visible = false;
                         placeOnGridAt(troggles[i], troggles[i].gridX, troggles[i].gridY);
                     }
+                }
+
+                 function levelUp(){
+                    ++level;                   
+                    if(score % 5000 == 0 && lives < 3) lives += 1; // reward lives? (improve)
+                    if(troggleRate > 2.5) troggleRate -= .5;       // more frequent troggles 
+
+                    // new game stuff.
+                    munchers.grid.generateMultiple();
+                    
+                    munchers.grid.reset();
+                    gridObject = munchers.grid.fill(game);
+          
+                    multipleOf = munchers.grid.number();
+
+                    levelText.text = levelString + level;
+                    multipleText.text = multipleString + multipleOf;
+                    liveText.text = liveString + lives;
+
+                    overlay.destroy();
+                    overlay = game.add.sprite(160, game.world.centerY - 40, "overlay1");
+                    overlay.visible = false;
+
+                    muncher.gridX = 2;
+                    muncher.gridY = 2;
+                    placeOnGridAt(muncher, muncher.gridX, muncher.gridY);
 
 
+                    game.paused = false;
                 }
 
                 function placeOnGridAt(item, x, y)
@@ -861,13 +859,12 @@ munchers.phaserFunctions = function(){
                 }
 
                 function gameOver() {
-                    
                     // Display End game overlay
 
                     // Submit to the leader board
 
                     // prompt to play a game?
-                } 
+                }
         }
     };
 }
