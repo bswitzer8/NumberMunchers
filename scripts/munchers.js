@@ -468,9 +468,8 @@ munchers.leaderBoard = munchers.createLeaderBoard();
                     if (canvasExists){
                         document.getElementById("phaser-canvas").style.color= "#000000";
                         document.getElementById("phaser-canvas").innerHTML = "";
-                    } else if (leaderBoardExists){
-                        
-                    }
+                    } 
+                    munchers.phaser.newGame();
                 } else {
                     console.log("Client Deauthenticated.");
                     document.getElementById("links__login").style.display= "initial";
@@ -478,8 +477,6 @@ munchers.leaderBoard = munchers.createLeaderBoard();
                     if (canvasExists){
                         document.getElementById("phaser-canvas").style.color= "#888888";
                         document.getElementById("phaser-canvas").innerHTML = "Welcome to Return of the Number Munchers!";
-                    } else if (leaderBoardExists){
-                        
                     }
                 }
             });
